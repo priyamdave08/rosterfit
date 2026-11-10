@@ -13,12 +13,15 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
+      # The runner's system Python is "externally managed" (PEP 668), so install into a venv.
       - name: Install
-        run: uv pip install --system -e ".[dev,aws,xgb]"
+        run: |
+          uv venv --python 3.12 .venv
+          uv pip install --python .venv/bin/python -e ".[dev,aws,xgb]"
       - name: Lint
-        run: ruff check src tests
+        run: .venv/bin/ruff check src tests
       - name: Unit tests (integration tests skip without local data)
-        run: pytest -q
+        run: .venv/bin/python -m pytest -q
 
   infra:
     runs-on: ubuntu-latest
