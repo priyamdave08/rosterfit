@@ -145,7 +145,10 @@ def free_agents(limit: int = 30) -> list[dict]:
 def move(req: MoveRequest) -> dict:
     c = ctx()
     incoming = [resolve(c, p) for p in req.incoming]
-    res = evaluate_move(c, req.team.upper(), incoming, req.outgoing)
+    try:
+        res = evaluate_move(c, req.team.upper(), incoming, req.outgoing)
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
     return clean({"team": res.team, "before_best": res.before_best, "after_best": res.after_best,
                   "ceiling_delta": res.ceiling_delta, "depth_delta": res.depth_delta,
                   "best_with": res.best_with, "displaces": res.displaces, "synergy": res.synergy,

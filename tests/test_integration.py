@@ -63,3 +63,18 @@ def test_model_card_beats_baselines(client):
     lm, pm = card["lineup_model"], card["prospect_model"]
     assert lm["net_mae"] <= lm["net_mae_bpm_baseline"]
     assert pm["ev_spearman_stats"] > pm["ev_spearman_pick"]
+
+
+def test_api_rejects_impossible_moves(client):
+    roster = client.get("/teams/SAS/roster").json()
+    own = roster[0]["player_id"]
+    other = client.get("/teams/BOS/roster").json()[0]["player_id"]
+    r = client.post("/moves/evaluate", json={"team": "SAS", "incoming": [other], "outgoing": [other]})
+    assert r.status_code == 400 and "not on SAS" in r.json()["detail"]
+    r = client.post("/moves/evaluate", json={"team": "SAS", "incoming": [own]})
+    assert r.status_code == 400 and "already on SAS" in r.json()["detail"]
+
+
+def test_api_search_ranks_prefix_first(client):
+    hits = client.get("/players/search", params={"q": "wemb"}).json()
+    assert hits[0]["player"] == "Victor Wembanyama"

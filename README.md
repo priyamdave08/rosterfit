@@ -79,6 +79,15 @@ Drafts, signings and trades are the same operation. For a move the engine report
 * **Spacing maps**: each lineup's five players are placed on the floor with the Hungarian algorithm (scipy `linear_sum_assignment`) matching skills to spots. Each player gets a "gravity" radius based on how far a defense must stretch to respect him, and the map flags congested paint.
 * Lineup drivers, shot-diet bars, career-path probabilities, league-percentile radar charts.
 
+### Design
+
+The dashboard is styled as a printed scouting report: warm paper and ink, condensed box-score headings
+(Barlow Condensed), IBM Plex Sans for text and IBM Plex Mono for figures. Each colour has one job: navy for
+anything you can act on, hardwood orange only for the wordmark and the painted area on court diagrams, and a
+single cold-to-hot scale for every "below or above league average" encoding (shot charts, rating drivers,
+career-path tiers). Tokens live in [`viz/palette.py`](src/rosterfit/viz/palette.py); a test checks every text
+colour against WCAG 2.2 AA and keeps the Streamlit theme in sync with the tokens.
+
 ### AI scouting memos
 One click turns the model outputs (grade, probabilities, SHAP drivers, comps, team fit) into a written memo from Claude, via **Amazon Bedrock** or the Claude API. Claude is instructed to use only the numbers in the packet, so every claim in the memo traces back to a model output. With no provider configured, a deterministic template memo is produced instead.
 
@@ -136,10 +145,10 @@ src/rosterfit/
   features/   shrinkage, player profiles, lineup features, archetypes, college features
   models/     lineup model, prospect models, MLflow registry
   engine/     context assembly, lineup optimiser, roster-move fit
-  viz/        half-court, shot charts, spacing maps
+  viz/        half-court, shot charts, spacing maps, design tokens (palette.py)
   cloud/      S3/Athena lake, Bedrock scouting memos
   api/        FastAPI
-  app/        Streamlit
+  app/        Streamlit: entry + navigation, ui.py (page chrome), common.py, views/ (one file per page)
 infra/        AWS CDK stack
 tests/        unit, mocked-AWS and end-to-end tests
 ```

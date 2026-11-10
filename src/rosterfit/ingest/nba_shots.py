@@ -56,6 +56,7 @@ def hexbin_chart(shots: pd.DataFrame, title: str = "", dark: bool = False):
     import numpy as np
     import plotly.graph_objects as go
 
+    from rosterfit.viz import palette
     from rosterfit.viz.court import base_figure
 
     shots = shots[(shots["y"] < 33) & (shots["x"].abs() <= 25)]
@@ -66,6 +67,6 @@ def hexbin_chart(shots: pd.DataFrame, title: str = "", dark: bool = False):
     fig.add_trace(go.Scatter(
         x=g["bx"], y=g["by"], mode="markers", hovertext=[f"{n} FGA, {fg:.0%}" for n, fg in zip(g["n"], g["fg"], strict=False)],
         hoverinfo="text", marker={"symbol": "hexagon", "size": 4 + 14 * np.sqrt(g["n"] / g["n"].max()),
-                                  "color": g["fg"], "colorscale": "RdBu_r", "cmin": 0.2, "cmax": 0.7,
+                                  "color": g["fg"], "colorscale": palette.DIVERGING, "cmin": 0.2, "cmax": 0.7,
                                   "colorbar": {"title": "FG%"}}))
     return fig

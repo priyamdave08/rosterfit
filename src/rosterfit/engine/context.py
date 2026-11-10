@@ -37,6 +37,35 @@ def _norm(s: pd.Series) -> pd.Series:
             .str.strip())
 
 
+def rank_search(names: pd.Series, text: str, limit: int | None = 10, min_fuzzy: float = 70.0) -> list:
+    """Index labels of `names` best matching `text`, best first.
+
+    Accent- and punctuation-insensitive. Exact name > name starts with query > a whole name
+    part equals query ("castle") > a name part starts with query ("wemb") > substring >
+    typo-tolerant fuzzy match. Ties keep the input order, so callers can pre-sort (e.g. by
+    minutes) to break them.
+    """
+    q = _norm(pd.Series([text or ""])).iloc[0]
+    if not q:
+        return list(names.index[:limit] if limit else names.index)
+    norm = _norm(names.fillna(""))
+    tokens = norm.str.split()
+    tier = pd.Series(0.0, index=names.index)
+    tier[norm.str.contains(q, regex=False)] = 150.0
+    tier[tokens.map(lambda t: any(w.startswith(q) for w in t))] = 200.0
+    tier[tokens.map(lambda t: q in t)] = 225.0
+    tier[norm.str.startswith(q)] = 250.0
+    tier[norm == q] = 300.0
+    rest = tier == 0
+    if rest.any():
+        fuzzy = process.extract(q, norm[rest].to_dict(), scorer=fuzz.WRatio, limit=None, score_cutoff=min_fuzzy)
+        for _, score, key in fuzzy:
+            tier[key] = score / 2          # always below every literal match
+    order = pd.DataFrame({"tier": tier, "pos": range(len(tier))}, index=names.index)
+    order = order[order["tier"] > 0].sort_values(["tier", "pos"], ascending=[False, True])
+    return list(order.index[:limit] if limit else order.index)
+
+
 @dataclass
 class Context:
     lineup_model: LineupModel
@@ -62,12 +91,10 @@ class Context:
         return fa.sort_values("bpm", ascending=False)
 
     def search_players(self, text: str, limit: int = 10) -> pd.DataFrame:
-        hits = process.extract(text, self.players["player"].to_dict(), scorer=fuzz.WRatio, limit=limit)
-        return self.players.loc[[h[2] for h in hits]]
+        return self.players.loc[rank_search(self.players["player"], text, limit)]
 
     def search_prospects(self, text: str, limit: int = 10) -> pd.DataFrame:
-        hits = process.extract(text, self.prospects["player"].to_dict(), scorer=fuzz.WRatio, limit=limit)
-        return self.prospects.loc[[h[2] for h in hits]]
+        return self.prospects.loc[rank_search(self.prospects["player"], text, limit)]
 
     def prospect_as_player(self, torvik_id: int) -> pd.Series:
         """A prospect's translated NBA profile, ready to drop into a lineup."""

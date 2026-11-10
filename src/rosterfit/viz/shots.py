@@ -18,6 +18,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from scipy.optimize import linear_sum_assignment
 
+from rosterfit.viz import palette
 from rosterfit.viz.court import BASELINE_Y, CORNER_X, CORNER_Y, THREE_R, base_figure
 
 GRID = 0.5
@@ -36,15 +37,16 @@ NBA_ZONES = {
     "Right corner 3": _IS_THREE & (_Y <= CORNER_Y) & (_X > 0),
     "Above-break 3": _IS_THREE & (_Y > CORNER_Y) & (_R < 30),
 }
-NBA_LABEL_POS = {"0-3 ft": (0, 0.6), "3-10 ft": (0, 6.5), "10-16 ft": (0, 13), "16 ft-3P": (0, 19.5),
-                 "Left corner 3": (-23.5, 0), "Right corner 3": (23.5, 0), "Above-break 3": (0, 27)}
+# Labels fan out left/right inside their distance band so bubbles never stack on the centre line.
+NBA_LABEL_POS = {"0-3 ft": (0, 0.6), "3-10 ft": (-5.2, 4.8), "10-16 ft": (8.6, 9.8), "16 ft-3P": (-13.5, 13.5),
+                 "Left corner 3": (-23.5, 0), "Right corner 3": (23.5, 0), "Above-break 3": (9, 25.8)}
 
 COLLEGE_ZONES = {
     "Rim": (_R < 4) & ~_IS_THREE,
     "2-pt jumper": (_R >= 4) & ~_IS_THREE,
     "Three": _IS_THREE & (_R < 30),
 }
-COLLEGE_LABEL_POS = {"Rim": (0, 0.8), "2-pt jumper": (0, 13), "Three": (0, 27)}
+COLLEGE_LABEL_POS = {"Rim": (0, 0.8), "2-pt jumper": (-9, 11), "Three": (9, 25.8)}
 
 
 @dataclass
@@ -95,7 +97,7 @@ def college_zones(row: pd.Series, league: dict[str, float]) -> dict[str, Zone]:
 
 
 def zone_chart(zones: dict[str, Zone], title: str = "", scheme: str = "nba", dark: bool = False,
-               height: int = 520) -> go.Figure:
+               height: int = 440) -> go.Figure:
     masks = NBA_ZONES if scheme == "nba" else COLLEGE_ZONES
     labels = NBA_LABEL_POS if scheme == "nba" else COLLEGE_LABEL_POS
     diff = np.full(_X.shape, np.nan)
@@ -106,20 +108,23 @@ def zone_chart(zones: dict[str, Zone], title: str = "", scheme: str = "nba", dar
         diff[mask] = d
         hover[mask] = f"{name}<br>{z.freq:.0%} of shots<br>FG {z.fg:.1%} (lg {z.lg_fg:.1%})"
     fig = base_figure(title, height=height, dark=dark)
-    fig.add_trace(go.Heatmap(x=_xs, y=_ys, z=diff, zmin=-10, zmax=10, colorscale="RdBu_r", opacity=0.75,
+    fig.add_trace(go.Heatmap(x=_xs, y=_ys, z=diff, zmin=-10, zmax=10, colorscale=palette.DIVERGING, opacity=0.8,
                              text=hover, hoverinfo="text",
-                             colorbar={"title": "FG% vs<br>league", "ticksuffix": " pts", "len": 0.6}))
+                             colorbar={"orientation": "h", "y": -0.02, "yanchor": "top", "len": 0.8,
+                                       "thickness": 10, "ticksuffix": " pts",
+                                       "title": {"text": "FG% vs league average", "side": "top"}}))
     # Volume bubbles (size ~ share of attempts) with labels.
     xs, ys, sizes, texts = [], [], [], []
     for name, (x, y) in labels.items():
         z = zones[name]
         xs.append(x), ys.append(y)
-        sizes.append(10 + 90 * np.sqrt(z.freq))
+        sizes.append(14 + 60 * np.sqrt(z.freq))
         texts.append(f"{z.freq:.0%}<br>{z.fg:.0%}" if z.freq > 0.005 else "")
-    fig.add_trace(go.Scatter(x=xs, y=ys, mode="markers+text", text=texts, textfont={"size": 11, "color": "black"},
-                             marker={"size": sizes, "color": "rgba(255,255,255,0.75)",
-                                     "line": {"color": "rgba(40,40,40,0.8)", "width": 1}},
+    fig.add_trace(go.Scatter(x=xs, y=ys, mode="markers+text", text=texts, textfont={"size": 11, "color": palette.INK, "family": palette.MONO_FONT},
+                             marker={"size": sizes, "color": palette.rgba("#FFFFFF", 0.82),
+                                     "line": {"color": palette.rgba(palette.INK, 0.7), "width": 1}},
                              hoverinfo="skip"))
+    fig.update_layout(margin={"l": 10, "r": 10, "t": 50 if title else 10, "b": 70})
     return fig
 
 
@@ -176,14 +181,14 @@ def spacing_map(five: pd.DataFrame, title: str = "", dark: bool = False, height:
         x, y, kind = SPOTS[spot]
         r = threat(p, kind)
         is_hl = highlight is not None and name == highlight
-        color = "42,127,98" if is_hl else ("31,78,121" if kind in ("corner", "wing", "top") else "184,70,27")
+        color = palette.HIGHLIGHT if is_hl else (palette.PRIMARY if kind in ("corner", "wing", "top") else palette.BRAND)
         t = np.linspace(0, 2 * np.pi, 60)
         fig.add_trace(go.Scatter(x=x + r * np.cos(t), y=y + r * np.sin(t), fill="toself", mode="lines",
-                                 line={"color": f"rgba({color},0.6)", "width": 1},
-                                 fillcolor=f"rgba({color},0.16)", hoverinfo="skip"))
+                                 line={"color": palette.rgba(color, 0.6), "width": 1},
+                                 fillcolor=palette.rgba(color, 0.14), hoverinfo="skip"))
         fig.add_trace(go.Scatter(x=[x], y=[y], mode="markers+text", text=[name.split(" ")[-1]],
-                                 textposition="top center", textfont={"size": 12},
-                                 marker={"size": 16, "color": f"rgb({color})", "line": {"color": "white", "width": 2}},
+                                 textposition="top center", textfont={"size": 12, "color": palette.INK},
+                                 marker={"size": 16, "color": color, "line": {"color": "white", "width": 2}},
                                  hovertext=f"{name}<br>{spot}<br>gravity radius {r:.1f} ft", hoverinfo="text"))
         if kind in ("corner", "wing", "top") and r >= 6:
             perimeter_threats += 1

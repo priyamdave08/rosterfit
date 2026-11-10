@@ -4,13 +4,15 @@ from __future__ import annotations
 import numpy as np
 import plotly.graph_objects as go
 
+from rosterfit.viz import palette
+
 BASELINE_Y = -5.25          # baseline is 5.25 ft behind the hoop centre
 HALFCOURT_Y = 41.75         # 47 ft from baseline
 THREE_R = 23.75
 CORNER_X = 22.0
 CORNER_Y = np.sqrt(THREE_R**2 - CORNER_X**2)  # ~8.95 ft: where the arc meets the corner lines
 
-LINE = "rgba(120,120,120,0.9)"
+LINE = palette.rgba(palette.INK, 0.55)
 
 
 def _arc(r, start, end, n=80, cx=0.0, cy=0.0):

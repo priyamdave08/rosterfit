@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from rosterfit.viz import shots
 
@@ -41,3 +42,19 @@ def test_spacing_map_flags_congestion(roster):
     clogged["player"] = ["A", "B", "C", "D", "E"]
     _, summary = shots.spacing_map(clogged)
     assert summary["congested"]
+
+
+@pytest.mark.parametrize("masks,labels", [(shots.NBA_ZONES, shots.NBA_LABEL_POS),
+                                          (shots.COLLEGE_ZONES, shots.COLLEGE_LABEL_POS)])
+def test_zone_labels_sit_inside_their_zone(masks, labels):
+    for name, (x, y) in labels.items():
+        i = int(round((y - shots._ys[0]) / shots.GRID))
+        j = int(round((x - shots._xs[0]) / shots.GRID))
+        assert masks[name][i, j], f"label for {name} is outside its zone"
+
+
+def test_zone_labels_do_not_stack():
+    pts = np.array(list(shots.NBA_LABEL_POS.values()))
+    d = np.hypot(*(pts[:, None, :] - pts[None, :, :]).transpose(2, 0, 1))
+    np.fill_diagonal(d, np.inf)
+    assert d.min() >= 6.5

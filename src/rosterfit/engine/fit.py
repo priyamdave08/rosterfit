@@ -104,6 +104,13 @@ def best_lineups(ctx: Context, team: str, top: int = 25) -> pd.DataFrame:
 def evaluate_move(ctx: Context, team: str, incoming: list[pd.Series], outgoing: list[str] | None = None,
                   with_synergy: bool = True) -> MoveResult:
     outgoing = outgoing or []
+    on_roster = set(ctx.team_roster(team).index)
+    not_here = [p for p in outgoing if p not in on_roster]
+    if not_here:
+        raise ValueError(f"outgoing players not on {team}: {', '.join(not_here)}")
+    already = [c["player_id"] for c in incoming if c["player_id"] in on_roster]
+    if already:
+        raise ValueError(f"incoming players already on {team}: {', '.join(already)}")
     before = best_lineups(ctx, team, top=None)
     pool = _with_candidates(ctx, team, incoming, outgoing)
     after = score_lineups(ctx.lineup_model, pool, top=None, pool_size=11 + len(incoming))
