@@ -49,4 +49,9 @@ def root() -> RedirectResponse:
 
 
 if __name__ == "__main__":
+    # On ZeroGPU, Gradio's launch() reports the GPU functions to the scheduler; this app serves
+    # FastAPI directly, so it makes the same startup call itself before the server starts.
+    zero_startup = getattr(getattr(spaces, "zero", None), "startup", None)
+    if zero_startup is not None:
+        zero_startup()
     uvicorn.run(app, host="0.0.0.0", port=7860)
