@@ -8,7 +8,11 @@ An NBA front-office tool that answers three questions with one engine:
 
 It runs on live 2026-27 rosters and on data back to 2010.
 
-**Live demo: [rosterfit.streamlit.app](https://rosterfit.streamlit.app)** (free hosting: the first visit after a quiet period takes about a minute to wake up, and the Draft Room fit analysis takes a minute or two).
+**Live app: [rosterfit.vercel.app](https://rosterfit.vercel.app)**, the React front end, backed by the engine API on a
+[Hugging Face Space](https://huggingface.co/spaces/PriyamDave/rosterfit-api)
+([API docs](https://priyamdave-rosterfit-api.hf.space/docs)). The original Streamlit dashboard is still live at
+[rosterfit.streamlit.app](https://rosterfit.streamlit.app). All three run on free hosting, so the first visit after
+a quiet period can take a minute while the API wakes up, and the Draft Room fit analysis takes a minute or two.
 
 ## Results (out of sample)
 
@@ -83,7 +87,13 @@ Drafts, signings and trades are the same operation. For a move the engine report
 
 ### Design
 
-The dashboard is styled as a printed scouting report: warm paper and ink, condensed box-score headings
+The React front end ([`web/`](web)) is drawn in the loaded team's uniform: every player appears as his real
+jersey number in layered tackle twill, the shell bar takes the team's colours with a stitched hem, and data
+colours never borrow team colour (warm for above league average, cool for below). It meets WCAG 2.2 AA
+(AccessLint scan clean on every workspace), keeps each view in the URL so it can be linked, and uses motion
+only to show what changed. The system is written up in [`DESIGN.md`](DESIGN.md).
+
+The Streamlit dashboard is styled as a printed scouting report: warm paper and ink, condensed box-score headings
 (Barlow Condensed), IBM Plex Sans for text and IBM Plex Mono for figures. Each colour has one job: navy for
 anything you can act on, hardwood orange only for the wordmark and the painted area on court diagrams, and a
 single cold-to-hot scale for every "below or above league average" encoding (shot charts, rating drivers,
@@ -125,6 +135,13 @@ make mlflow                                # experiment history
 make test
 ```
 
+React front end (needs the API running):
+
+```bash
+make api                                   # in one terminal
+cd web && npm ci && npm run dev            # http://localhost:5173
+```
+
 To use Claude for memos, set `ANTHROPIC_API_KEY` (Claude API) or `ROSTERFIT_LLM_PROVIDER=bedrock` with AWS credentials and `AWS_REGION`.
 
 ### Deploying to AWS
@@ -149,8 +166,10 @@ src/rosterfit/
   engine/     context assembly, lineup optimiser, roster-move fit
   viz/        half-court, shot charts, spacing maps, design tokens (palette.py)
   cloud/      S3/Athena lake, Bedrock scouting memos
-  api/        FastAPI
+  api/        FastAPI (main.py, plus ui.py: the endpoints the React front end reads)
   app/        Streamlit: entry + navigation, ui.py (page chrome), common.py, views/ (one file per page)
+web/          React front end (Vite + TypeScript), deployed on Vercel
+deploy/       Hugging Face Space for the API (app.py, plus a Dockerfile for any Docker host)
 infra/        AWS CDK stack
 tests/        unit, mocked-AWS and end-to-end tests
 ```
