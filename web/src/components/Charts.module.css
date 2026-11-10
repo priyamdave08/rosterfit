@@ -1,0 +1,125 @@
+.figure {
+  margin: 0;
+  background: var(--surface);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  padding: var(--s-4);
+  min-width: 0;
+}
+.title {
+  font-weight: 600;
+  font-size: var(--fs-md);
+  margin-bottom: var(--s-3);
+}
+.axisNote {
+  margin-top: var(--s-3);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+.drivers, .shares {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.driverRow {
+  display: grid;
+  grid-template-columns: minmax(120px, 36%) 1fr 52px;
+  align-items: center;
+  gap: var(--s-3);
+  font-size: var(--fs-sm);
+}
+.driverLabel { color: var(--ink-2); text-align: right; }
+.track {
+  position: relative;
+  height: 14px;
+}
+.axis {
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  bottom: -3px;
+  width: 1px;
+  background: var(--ink-2);
+}
+.bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 1px;
+}
+.helps { background: var(--hot); }
+.hurts { background: var(--cold); }
+.bar[data-clipped] { background-image: repeating-linear-gradient(90deg, transparent 0 6px, rgba(255, 255, 255, 0.55) 6px 7px); }
+.driverValue { text-align: right; font-weight: 600; }
+.shareRow {
+  display: grid;
+  grid-template-columns: minmax(110px, 34%) 1fr 44px;
+  align-items: center;
+  gap: var(--s-3);
+  font-size: var(--fs-sm);
+}
+.shareLabel { color: var(--ink-2); text-align: right; }
+.shareTrack {
+  height: 14px;
+  background: var(--surface-sunk);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.shareBar { display: block; height: 100%; }
+.shareValue { text-align: right; font-weight: 600; }
+.zoneLabel {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: grid;
+  justify-items: center;
+  min-width: 42px;
+  padding: 2px 5px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid var(--ink-2);
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  line-height: 1.15;
+}
+.zoneLabel b { font-size: var(--fs-sm); }
+.scale {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+.ramp {
+  flex: 1;
+  max-width: 260px;
+  height: 8px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, var(--cold), #efebe3, var(--hot));
+}
+.radarLabel {
+  font: 500 11px var(--font-ui);
+  fill: var(--ink-2);
+}
+.tick {
+  font: 400 11px var(--font-ui);
+  fill: var(--muted);
+}
+.legend {
+  list-style: none;
+  padding: 0;
+  margin: var(--s-2) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+.legend span {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  vertical-align: -1px;
+}

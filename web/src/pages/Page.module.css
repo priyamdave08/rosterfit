@@ -1,0 +1,185 @@
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: var(--s-5);
+  align-items: start;
+}
+.stickyCol {
+  position: sticky;
+  top: calc(var(--shell-h) + var(--s-4));
+  display: grid;
+  gap: var(--s-4);
+}
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-4);
+  margin-top: var(--s-4);
+  align-items: start;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4) var(--s-5);
+  align-items: flex-end;
+}
+.filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s-4) var(--s-5);
+  align-items: start;
+}
+.lead {
+  font-size: var(--fs-lg);
+}
+.hint {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+.saveRow {
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-end;
+  max-width: 520px;
+}
+.saveRow > :first-child { flex: 1; }
+.subsection {
+  display: grid;
+  gap: var(--s-2);
+  margin-top: var(--s-4);
+}
+.inlineNums {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.details {
+  margin-top: var(--s-7);
+  border-top: 1px solid var(--rule);
+  padding-top: var(--s-4);
+}
+.details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: var(--fs-lg);
+  margin-bottom: var(--s-3);
+  border-radius: var(--radius);
+}
+.details[open] > summary { margin-bottom: var(--s-4); }
+.memo {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: var(--s-5);
+  max-width: 78ch;
+  line-height: 1.6;
+}
+.three {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s-4);
+}
+.prose {
+  max-width: 75ch;
+  color: var(--ink-2);
+  display: grid;
+  gap: var(--s-3);
+}
+.prose strong { color: var(--ink); }
+@media (max-width: 1080px) {
+  .split { grid-template-columns: 1fr; }
+  .stickyCol { position: static; }
+}
+@media (max-width: 860px) {
+  .pair, .three { grid-template-columns: 1fr; }
+  .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .filters { grid-template-columns: 1fr; }
+  .saveRow { flex-direction: column; align-items: stretch; }
+}
+.linkBtn {
+  all: unset;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+  border-radius: 2px;
+}
+.linkBtn:hover { text-decoration: underline; text-underline-offset: 3px; }
+.linkBtn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.linkBtn[aria-pressed="true"] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.cardsLayout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: var(--s-5);
+  align-items: start;
+}
+.searchCol {
+  position: sticky;
+  top: calc(var(--shell-h) + var(--s-4));
+  display: grid;
+  gap: var(--s-2);
+}
+.resultList {
+  list-style: none;
+  margin: 0;
+  padding: var(--s-1);
+  max-height: 60vh;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+}
+.result {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 6px var(--s-2);
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: var(--fs-sm);
+}
+.result:hover { background: var(--surface-sunk); }
+.result:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.resultOn,
+.resultOn:hover { background: color-mix(in srgb, var(--team) 10%, var(--surface)); font-weight: 600; }
+.resultTeam { color: var(--muted); font-size: var(--fs-xs); }
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+}
+.selectField {
+  display: grid;
+  gap: var(--s-1);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  max-width: 220px;
+}
+.selectField select {
+  min-height: 40px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-weight: 500;
+}
+.raw {
+  max-height: 420px;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  padding: var(--s-4);
+  font-size: var(--fs-xs);
+}
+@media (max-width: 900px) {
+  .cardsLayout { grid-template-columns: 1fr; }
+  .searchCol { position: static; }
+  .resultList { max-height: 260px; }
+}

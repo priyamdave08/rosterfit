@@ -1,0 +1,103 @@
+.skip {
+  position: absolute;
+  left: var(--s-4);
+  top: -48px;
+  z-index: 50;
+  background: var(--ink);
+  color: var(--ground);
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--radius);
+}
+.skip:focus { top: var(--s-2); }
+
+/* Team-colored shell bar with a stitched double rule in the team's secondary. */
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--team);
+  color: var(--on-team);
+  box-shadow: 0 2px 0 var(--team), 0 4px 0 var(--team-2), 0 6px 0 var(--team);
+  transition: background-color var(--dur) var(--ease-out);
+}
+.inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  height: var(--shell-h);
+  padding: 0 var(--s-6);
+  display: flex;
+  align-items: center;
+  gap: var(--s-6);
+}
+.mark {
+  font: 400 1.25rem/1 var(--font-twill);
+  letter-spacing: 0.03em;
+  color: var(--twill-fill);
+  -webkit-text-stroke: 1px var(--twill-edge);
+  paint-order: stroke fill;
+  white-space: nowrap;
+}
+.tabs {
+  display: flex;
+  gap: var(--s-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab {
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--radius);
+  color: var(--on-team-muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.tab:hover { color: var(--on-team); background: color-mix(in srgb, var(--on-team) 12%, transparent); }
+.tab:focus-visible { outline-color: var(--on-team); }
+.active,
+.active:hover { background: var(--ground); color: var(--ink); }
+.team {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--fs-sm);
+  color: var(--on-team-muted);
+}
+.team select {
+  min-width: 220px;
+  padding: 7px 30px 7px 10px;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--on-team) 45%, transparent);
+  background: color-mix(in srgb, var(--on-team) 8%, var(--team))
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23888' stroke-width='1.6'/%3E%3C/svg%3E")
+    no-repeat right 10px center;
+  color: var(--on-team);
+  font-weight: 600;
+  appearance: none;
+  cursor: pointer;
+}
+.team select:focus-visible { outline: 2px solid var(--on-team); outline-offset: 2px; }
+.team select option { color: var(--ink); background: var(--surface); }
+.main {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--s-6) var(--s-6) var(--s-7);
+  outline: none;
+}
+.footer {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--s-4) var(--s-6) var(--s-6);
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+@media (max-width: 900px) {
+  .inner { gap: var(--s-4); padding: 0 var(--s-4); height: auto; min-height: var(--shell-h); flex-wrap: wrap; padding-top: var(--s-2); padding-bottom: var(--s-2); }
+  .tabs { order: 3; width: 100%; }
+  .team select { min-width: 0; width: 180px; }
+  .main { padding: var(--s-5) var(--s-4) var(--s-6); }
+  .footer { padding: var(--s-4); }
+}
