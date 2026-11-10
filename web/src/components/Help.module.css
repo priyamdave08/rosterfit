@@ -6,7 +6,7 @@
 .button {
   border: 0;
   background: none;
-  padding: 2px;
+  padding: 5px;
   color: var(--muted);
   cursor: help;
   display: inline-grid;

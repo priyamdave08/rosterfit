@@ -28,7 +28,11 @@ export function scrollToTop(): void {
 }
 
 /** Bring an element into view, smoothly unless the visitor asked for reduced motion. */
-export function scrollToElement(el: HTMLElement, offset = -80): void {
+export function scrollToElement(el: HTMLElement): void {
+  // Clear the team bar only while it actually sticks (it scrolls away on narrow screens).
+  const bar = document.querySelector<HTMLElement>("header");
+  const covered = bar && getComputedStyle(bar).position === "sticky" ? bar.offsetHeight : 0;
+  const offset = -(covered + 16);
   if (lenis) lenis.scrollTo(el, { offset, duration: 0.45 });
   else el.scrollIntoView({ block: "start", behavior: prefersReducedMotion() ? "auto" : "smooth" });
 }

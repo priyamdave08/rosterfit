@@ -18,6 +18,9 @@ export function SpacingMap({ detail, title }: { detail: LineupDetail; title: str
   const root = useRef<HTMLDivElement>(null);
   const prev = useRef<Map<string, { x: number; y: number; r: number }>>(new Map());
   const byId = new Map(detail.players.map((p) => [p.id, p]));
+  // Animate on what is drawn, not on object identity: a refetch that hands back an equal unit
+  // must not re-run (and so revert) the glide and the stitch mid-flight.
+  const layout = detail.spacing.players.map((sp) => `${sp.id ?? sp.player}@${sp.x},${sp.y},${sp.radius}`).join("|");
 
   useLayoutEffect(() => {
     const el = root.current;
@@ -27,7 +30,7 @@ export function SpacingMap({ detail, title }: { detail: LineupDetail; title: str
     const ctx = gsap.context(() => {
       if (reduced) return;
       for (const [key, pos] of now) {
-        const marker = el.querySelector<HTMLElement>(`[data-key="${CSS.escape(key)}"]`);
+        const marker = el.querySelector<HTMLElement>(`div[data-key="${CSS.escape(key)}"]`);
         const ring = el.querySelector<SVGCircleElement>(`circle[data-key="${CSS.escape(key)}"]`);
         if (!marker || !ring) continue;
         const before = prev.current.get(key);
@@ -44,17 +47,21 @@ export function SpacingMap({ detail, title }: { detail: LineupDetail; title: str
           gsap.fromTo(marker, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.2, ease: "power3.out" });
           gsap.fromTo(ring, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power3.out" });
         }
-        // An incoming player's outer twill layer stitches itself on, once.
-        if (key === detail.highlight && !before) {
+        // Any player new to the unit (a builder swap, a different unit, a roster move) has his
+        // outer twill layer stitched back on, once. The dash covers the whole glyph outline.
+        if (!before && prev.current.size) {
           const stitch = marker.querySelector<SVGTextElement>("[data-stitch]");
-          if (stitch)
-            gsap.fromTo(stitch, { strokeDasharray: 240, strokeDashoffset: 240 }, { strokeDashoffset: 0, duration: 0.6, ease: "power3.out", delay: 0.1, clearProps: "strokeDasharray,strokeDashoffset" });
+          if (stitch) {
+            const len = Math.ceil(Math.max(stitch.getComputedTextLength(), 10) * 5);
+            gsap.fromTo(stitch, { strokeDasharray: len, strokeDashoffset: len }, { strokeDashoffset: 0, duration: 0.6, ease: "power3.out", delay: 0.1, clearProps: "strokeDasharray,strokeDashoffset" });
+          }
         }
       }
     }, el);
     prev.current = now;
     return () => ctx.revert();
-  }, [detail]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the drawn layout on purpose
+  }, [layout]);
 
   const { perimeter_threats, paint_bodies, congested } = detail.spacing;
   return (

@@ -63,7 +63,10 @@ export function colorway(primary: string, secondary: string): Colorway {
   const fills = [WHITE, sec].filter((c) => contrast(c, twillInner) >= 3);
   const twillFill = fills.sort((a, b) => contrast(b, twillInner) - contrast(a, twillInner))[0] ?? textOn(twillInner);
   // Outer outline: the secondary when it is distinct from the inner outline, otherwise a quiet rule.
-  const twillOuter = contrast(sec, twillInner) >= 1.6 && sec !== twillFill ? sec : mix(twillInner, GROUND, 0.55);
+  // A pale secondary (silver, light gray) would vanish on the white table and the ground, so it
+  // is deepened until the third layer reads.
+  const outerSec = contrast(sec, WHITE) < 1.8 ? mix(sec, INK, 0.35) : sec;
+  const twillOuter = contrast(outerSec, twillInner) >= 1.6 && outerSec !== twillFill ? outerSec : mix(twillInner, GROUND, 0.55);
   return { team, team2: sec, onTeam, onTeamMuted, twillFill, twillInner, twillOuter };
 }
 

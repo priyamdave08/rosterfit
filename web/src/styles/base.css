@@ -9,7 +9,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   /* keyboard focus and in-page links never land under the sticky team bar */
-  scroll-padding-top: calc(var(--shell-h) + var(--s-4));
+  scroll-padding-top: calc(var(--bar-stick) + var(--s-4));
   scrollbar-color: var(--rule) var(--ground);
 }
 
@@ -107,6 +107,7 @@ html.lenis body { height: auto; }
   summary {
     min-height: 44px;
   }
-  [aria-label^="About "] { min-width: 44px; display: inline-grid; place-items: center; }
+  /* the 44px hit area overhangs instead of pushing the label onto a second line */
+  [aria-label^="About "] { min-width: 44px; display: inline-grid; place-items: center; margin: -10px -8px; }
   [aria-label^="Remove "] { min-width: 44px; }
 }

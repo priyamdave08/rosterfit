@@ -1,0 +1,505 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-10T22:24:05.010750+00:00",
+  "title": "Design System: RosterFit",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "primary",
+        "displayName": "Box-Score Ink",
+        "canonical": "#121212",
+        "tonalRamp": [
+          "#050505",
+          "#090909",
+          "#0d0d0d",
+          "#101010",
+          "#4d4d4d",
+          "#888888",
+          "#c4c4c4",
+          "#e7e7e7"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Second Ink",
+        "canonical": "#45433f",
+        "tonalRamp": [
+          "#151413",
+          "#222220",
+          "#302f2c",
+          "#3d3b37",
+          "#74726f",
+          "#a2a19f",
+          "#d0d0cf",
+          "#ececec"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "#5f5c56",
+        "tonalRamp": [
+          "#1c1c1a",
+          "#302e2b",
+          "#42403c",
+          "#54514c",
+          "#878580",
+          "#afaeaa",
+          "#d7d6d5",
+          "#efefee"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Home-White Mesh",
+        "canonical": "#f5f4ef",
+        "tonalRamp": [
+          "#4a4948",
+          "#7a7a78",
+          "#acaba7",
+          "#d8d7d2",
+          "#f8f7f3",
+          "#fafaf7",
+          "#fcfcfb",
+          "#fefefd"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Panel White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#4c4c4c",
+          "#808080",
+          "#b2b2b2",
+          "#e0e0e0",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff"
+        ]
+      },
+      "surface-sunk": {
+        "role": "neutral",
+        "displayName": "Sunk Panel",
+        "canonical": "#eceae4",
+        "tonalRamp": [
+          "#474644",
+          "#767572",
+          "#a5a4a0",
+          "#d0cec9",
+          "#f1efeb",
+          "#f6f4f2",
+          "#fafaf8",
+          "#fdfdfc"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#cfcbc1",
+        "tonalRamp": [
+          "#3e3d3a",
+          "#686660",
+          "#918e87",
+          "#b6b3aa",
+          "#dbd8d0",
+          "#e7e5e0",
+          "#f3f2f0",
+          "#fafaf9"
+        ]
+      },
+      "rule-soft": {
+        "role": "neutral",
+        "displayName": "Soft Hairline",
+        "canonical": "#e3e0d8",
+        "tonalRamp": [
+          "#444341",
+          "#72706c",
+          "#9f9d97",
+          "#c8c5be",
+          "#eae8e2",
+          "#f1f0ec",
+          "#f8f7f5",
+          "#fcfcfb"
+        ]
+      },
+      "hot": {
+        "role": "data",
+        "displayName": "Above-Average Brick",
+        "canonical": "#b03a28",
+        "tonalRamp": [
+          "#35110c",
+          "#581d14",
+          "#7b291c",
+          "#9b3323",
+          "#c46b5e",
+          "#d89c94",
+          "#ebcec9",
+          "#f7ebea"
+        ]
+      },
+      "hot-tint": {
+        "role": "data",
+        "displayName": "Hot Tint",
+        "canonical": "#f3dcd6",
+        "tonalRamp": [
+          "#494240",
+          "#7a6e6b",
+          "#aa9a96",
+          "#d6c2bc",
+          "#f6e5e0",
+          "#f9eeea",
+          "#fcf6f5",
+          "#fefcfb"
+        ]
+      },
+      "cold": {
+        "role": "data",
+        "displayName": "Below-Average Harbor Blue",
+        "canonical": "#285f9a",
+        "tonalRamp": [
+          "#0c1c2e",
+          "#14304d",
+          "#1c426c",
+          "#235488",
+          "#5e87b3",
+          "#94afcc",
+          "#c9d7e6",
+          "#eaeff5"
+        ]
+      },
+      "cold-tint": {
+        "role": "data",
+        "displayName": "Cold Tint",
+        "canonical": "#d9e4f0",
+        "tonalRamp": [
+          "#414448",
+          "#6c7278",
+          "#98a0a8",
+          "#bfc9d3",
+          "#e2ebf4",
+          "#ecf2f8",
+          "#f6f8fb",
+          "#fbfcfe"
+        ]
+      },
+      "slate": {
+        "role": "data",
+        "displayName": "Neutral Series Slate",
+        "canonical": "#3e5770",
+        "tonalRamp": [
+          "#131a22",
+          "#1f2c38",
+          "#2b3d4e",
+          "#374d63",
+          "#6e8194",
+          "#9eabb8",
+          "#cfd5db",
+          "#eceef1"
+        ]
+      },
+      "paint": {
+        "role": "data",
+        "displayName": "Paint Ochre",
+        "canonical": "#8c6d1f",
+        "tonalRamp": [
+          "#2a2109",
+          "#463610",
+          "#624c16",
+          "#7b601b",
+          "#a99257",
+          "#c6b68f",
+          "#e2dac7",
+          "#f4f0e9"
+        ]
+      },
+      "ok": {
+        "role": "semantic",
+        "displayName": "Fit Green",
+        "canonical": "#2a7a5e",
+        "tonalRamp": [
+          "#0d251c",
+          "#153d2f",
+          "#1d5542",
+          "#256b53",
+          "#5f9b86",
+          "#94bcae",
+          "#caded7",
+          "#eaf2ef"
+        ]
+      },
+      "warn": {
+        "role": "semantic",
+        "displayName": "Caution Amber",
+        "canonical": "#8a5f00",
+        "tonalRamp": [
+          "#291c00",
+          "#453000",
+          "#614200",
+          "#795400",
+          "#a78740",
+          "#c4af80",
+          "#e2d7bf",
+          "#f3efe6"
+        ]
+      },
+      "warn-tint": {
+        "role": "semantic",
+        "displayName": "Caution Tint",
+        "canonical": "#f4ead2",
+        "tonalRamp": [
+          "#49463f",
+          "#7a7569",
+          "#aba493",
+          "#d7ceb9",
+          "#f7efdd",
+          "#faf4e8",
+          "#fcfaf4",
+          "#fefdfa"
+        ]
+      },
+      "err": {
+        "role": "semantic",
+        "displayName": "Error Red",
+        "canonical": "#b23a2e",
+        "tonalRamp": [
+          "#35110e",
+          "#591d17",
+          "#7d2920",
+          "#9d3328",
+          "#c56b62",
+          "#d89c96",
+          "#eccecb",
+          "#f7ebea"
+        ]
+      },
+      "focus": {
+        "role": "semantic",
+        "displayName": "Focus Blue",
+        "canonical": "#1d4e89",
+        "tonalRamp": [
+          "#091729",
+          "#0e2744",
+          "#143760",
+          "#1a4579",
+          "#567aa6",
+          "#8ea6c4",
+          "#c6d3e2",
+          "#e8edf3"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "numeral": {
+        "displayName": "Twill Numeral",
+        "purpose": "Jersey numbers and the wordmark only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page h1."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section titles."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Stat line values."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text."
+      },
+      "body-sm": {
+        "displayName": "Body small",
+        "purpose": "Tables, controls, help."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase table headers and stat labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "raise",
+        "value": "0 1px 2px rgba(18,18,18,0.08), 0 4px 12px rgba(18,18,18,0.06)",
+        "purpose": "Floating help tooltips only."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "Entrances, presses, tooltips."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.77, 0, 0.175, 1)",
+        "purpose": "On-screen movement such as the court glide."
+      },
+      {
+        "name": "dur-fast",
+        "value": "140ms",
+        "purpose": "Hover and tooltip."
+      },
+      {
+        "name": "dur",
+        "value": "220ms",
+        "purpose": "State transitions."
+      },
+      {
+        "name": "glide",
+        "value": "280ms power4.inOut",
+        "purpose": "Players moving to a new spot."
+      },
+      {
+        "name": "stitch",
+        "value": "600ms power3.out",
+        "purpose": "Outer twill layer drawn on for a player new to the unit."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stats-2col",
+        "value": "720px"
+      },
+      {
+        "name": "bar-wraps",
+        "value": "900px"
+      },
+      {
+        "name": "court-above-table",
+        "value": "1080px"
+      },
+      {
+        "name": "compact-bar",
+        "value": "420px"
+      }
+    ],
+    "runtimeColorway": {
+      "vars": [
+        "--team",
+        "--team-2",
+        "--on-team",
+        "--on-team-muted",
+        "--twill-fill",
+        "--twill-inner",
+        "--twill-outer"
+      ],
+      "source": "web/src/lib/color.ts colorway()"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main action on a form, such as Evaluate move.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Evaluate move</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:3px;font:600 13px/1 Archivo,system-ui,sans-serif;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1),background-color 140ms ease}.ds-btn-primary{background:#121212;color:#f5f4ef;border:1px solid #121212}.ds-btn-primary:hover{background:#2b2b2b}.ds-btn:active{transform:scale(0.97)}.ds-btn:focus-visible{outline:2px solid #1d4e89;outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Supporting action, such as Save lineup.",
+      "html": "<button class=\"ds-btn2\">Save lineup</button>",
+      "css": ".ds-btn2{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:3px;font:600 13px/1 Archivo,system-ui,sans-serif;background:#fff;color:#121212;border:1px solid #cfcbc1;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1),background-color 140ms ease,border-color 140ms ease}.ds-btn2:hover{background:#eceae4;border-color:#45433f}.ds-btn2:active{transform:scale(0.97)}.ds-btn2:focus-visible{outline:2px solid #1d4e89;outline-offset:2px}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "Search and free-text fields with a visible label.",
+      "html": "<label class=\"ds-field\"><span>Search players</span><input class=\"ds-input\" placeholder=\"Type a name\"></label>",
+      "css": ".ds-field{display:grid;gap:4px;font:600 13px Archivo,system-ui,sans-serif;color:#121212}.ds-input{min-height:40px;padding:0 12px;border:1px solid #cfcbc1;border-radius:3px;background:#fff;font:400 15px Archivo,system-ui,sans-serif}.ds-input:focus{outline:0;border-color:#1d4e89;box-shadow:0 0 0 1px #1d4e89}.ds-input::placeholder{color:#5f5c56}"
+    },
+    {
+      "name": "Workspace Tabs",
+      "kind": "nav",
+      "refersTo": "nav-tab-active",
+      "description": "Team-colored shell bar tabs with a stitched hem.",
+      "html": "<nav class=\"ds-bar\"><a class=\"ds-tab ds-on\" href=\"#\">Lineup Lab</a><a class=\"ds-tab\" href=\"#\">Draft Room</a><a class=\"ds-tab\" href=\"#\">Player Cards</a></nav>",
+      "css": ".ds-bar{position:relative;display:flex;gap:4px;padding:14px 16px;background:#121212}.ds-bar::after{content:'';position:absolute;left:0;right:0;top:100%;height:8px;background:repeating-linear-gradient(90deg,#c4ced4 0 6px,transparent 6px 10px) 0 1px/100% 2px no-repeat,repeating-linear-gradient(90deg,#c4ced4 0 6px,transparent 6px 10px) 0 5px/100% 2px no-repeat,#121212}.ds-tab{padding:8px 12px;border-radius:3px;color:#d7d7d7;text-decoration:none;font:600 13px Archivo,system-ui,sans-serif}.ds-tab:hover{color:#fff;background:rgba(255,255,255,0.12)}.ds-tab:focus-visible{outline:2px solid #fff;outline-offset:2px}.ds-on,.ds-on:hover{background:#f5f4ef;color:#121212}"
+    },
+    {
+      "name": "Twill Numeral",
+      "kind": "custom",
+      "refersTo": "numeral",
+      "description": "A player's real jersey number as layered tackle twill in the team colorway.",
+      "html": "<svg class=\"ds-twill\" viewBox=\"0 0 45 36\" width=\"45\" height=\"36\"><text x=\"22.5\" y=\"28.8\" text-anchor=\"middle\" font-size=\"30\" fill=\"#868c90\" stroke=\"#868c90\" stroke-width=\"6\" stroke-linejoin=\"round\" paint-order=\"stroke\">21</text><text x=\"22.5\" y=\"28.8\" text-anchor=\"middle\" font-size=\"30\" fill=\"none\" stroke=\"#fff\" stroke-width=\"4\" stroke-dasharray=\"1.8 1.5\">21</text><text x=\"22.5\" y=\"28.8\" text-anchor=\"middle\" font-size=\"30\" fill=\"#fff\" stroke=\"#121212\" stroke-width=\"2.4\" stroke-linejoin=\"round\" paint-order=\"stroke\">21</text></svg>",
+      "css": ".ds-twill{overflow:visible;font-family:Graduate,Archivo,serif;letter-spacing:-0.02em}"
+    },
+    {
+      "name": "Stat Line",
+      "kind": "custom",
+      "refersTo": "figure",
+      "description": "Box-score figures under heavy ink rules, aligned by subgrid.",
+      "html": "<dl class=\"ds-stats\"><div><dt>Net rating</dt><dd>+16.9</dd></div><div><dt>Offense vs avg</dt><dd>+8.8</dd></div><div><dt>Defense vs avg</dt><dd>+8.1</dd></div></dl>",
+      "css": ".ds-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0;font-family:Archivo,system-ui,sans-serif}.ds-stats div{border-top:3px solid #121212;padding-top:8px}.ds-stats dt{font:600 12px/1.3 'Archivo Narrow',Archivo,sans-serif;letter-spacing:0.08em;text-transform:uppercase;color:#45433f}.ds-stats dd{margin:2px 0 0;font-size:30px;font-weight:600;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Help Tooltip",
+      "kind": "custom",
+      "refersTo": "tooltip",
+      "description": "Keyboard-reachable explanation for a number or column.",
+      "html": "<span class=\"ds-tip\">Volume-weighted 3P% above 30%</span>",
+      "css": ".ds-tip{display:inline-block;max-width:280px;background:#121212;color:#f5f4ef;font:400 13px/1.45 Archivo,system-ui,sans-serif;padding:8px 12px;border-radius:3px;box-shadow:0 1px 2px rgba(18,18,18,0.08),0 4px 12px rgba(18,18,18,0.06)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Tackle Twill",
+    "overview": "RosterFit is drawn in the loaded team's uniform. Every player on screen wears his real jersey number as layered tackle twill in that team's colorway, so a five-man unit reads the way a coach reads his floor: numbers at their spots, not anonymous name rows. The page itself is the home-white jersey: a warm off-white ground with a faint dot mesh, a shell bar in the team's primary with a two-row running stitch in its secondary along its hem.\n\nEverything else stays quiet so the numbers can talk. The analysis surfaces are flat white panels with hairline rules, tabular figures and a box-score stat line. Data has its own palette that never borrows team color, so a Lakers gold and a Warriors gold never get confused with \"above average\". Density is that of a daily tool: tables that fit their column, a sticky half court beside them, no hero, no marketing rhythm. Motion only marks a state change: a swapped player glides to his spot and has his numeral re-stitched.",
+    "keyCharacteristics": [
+      "Real jersey numbers as three-layer SVG twill (fill, inner outline in the primary, outer outline in the secondary, a dashed sewing line between them at court and card sizes).",
+      "Team colorway is runtime and scoped to identity: shell bar, wordmark, numerals. Never data.",
+      "Home-white mesh ground (#f5f4ef plus a 3.5% dot weave), white surfaces, 3px corners.",
+      "Box-score typography: Archivo for UI, Archivo Narrow uppercase for labels, Graduate block for numerals and the wordmark, tabular figures everywhere.",
+      "Every headline number has an explanation one click away (a help button or an evidence link)."
+    ],
+    "rules": [
+      {
+        "name": "The Uniform Is Identity Rule",
+        "body": "Team color dresses the shell bar, the wordmark and the numerals. It never encodes a value, a status or a selection tint stronger than 9%.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Direction Data Rule",
+        "body": "Warm means above average or helps, cool means below average or hurts, slate means neither. One fixed scale per comparison, centered on league average.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Every number is set in tabular figures (`font-feature-settings: \"tnum\"` on body), so columns and rolling counters never shift.",
+        "section": "typography"
+      },
+      {
+        "name": "The Numerals Only Rule",
+        "body": "Graduate is reserved for jersey numbers and the wordmark. Headings and figures stay in Archivo.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Panel Rule",
+        "body": "Panels, cards and tables never carry a shadow; they are separated by a 1px rule-soft border on white.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do show players as their real jersey numbers in the selected team's colorway wherever a lineup appears.",
+      "Do keep data colors fixed (hot, cold, slate) and independent of the team.",
+      "Do put an explanation one click from every headline number: a help button or an evidence link.",
+      "Do keep motion to state feedback under 300ms on the strong ease-out or ease-in-out curves, transforms and opacity only, and drop it under reduced motion.",
+      "Do gate hover styles to `(hover: hover) and (pointer: fine)` and keep touch targets at 44px."
+    ],
+    "donts": [
+      "Don't use team color to encode a value, a direction or a status.",
+      "Don't add shadows to panels, cards or tables.",
+      "Don't use Graduate for headings or figures.",
+      "Don't use purple-to-blue gradients, gradient text, glassmorphism, colored-border cards, grain over gradients, emojis in headings, Inter, or Lucide icons.",
+      "Don't put a badge or eyebrow above a headline, or set three icon boxes in a row.",
+      "Don't fade sections in on scroll, add a cursor beam, or make buttons fade on hover.",
+      "Don't use em dashes or buzzwords in interface copy."
+    ]
+  }
+}

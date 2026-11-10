@@ -46,8 +46,20 @@ export function Twill({ person, size = "sm", incoming = false }: Props) {
       <text {...text} data-stitch fill="var(--twill-outer)" stroke="var(--twill-outer)" strokeWidth={fontSize * 0.2}>
         {label}
       </text>
+      {/* the sewing line: a dashed thread run through the outer layer, visible between the two outlines */}
+      {size !== "sm" && (
+        <text
+          {...text}
+          fill="none"
+          stroke="var(--twill-fill)"
+          strokeWidth={fontSize * 0.135}
+          strokeDasharray={`${fontSize * 0.06} ${fontSize * 0.05}`}
+        >
+          {label}
+        </text>
+      )}
       {/* inner layer: fill with the team-color outline */}
-      <text {...text} fill="var(--twill-fill)" stroke="var(--twill-inner)" strokeWidth={fontSize * 0.1}>
+      <text {...text} fill="var(--twill-fill)" stroke="var(--twill-inner)" strokeWidth={fontSize * (size === "sm" ? 0.1 : 0.08)}>
         {label}
       </text>
     </svg>

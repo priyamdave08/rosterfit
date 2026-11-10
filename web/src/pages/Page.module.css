@@ -6,7 +6,7 @@
 }
 .stickyCol {
   position: sticky;
-  top: calc(var(--shell-h) + var(--s-4));
+  top: calc(var(--bar-stick) + var(--s-4));
   display: grid;
   gap: var(--s-4);
 }
@@ -102,6 +102,9 @@
 .linkBtn {
   all: unset;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   font-weight: 600;
   color: var(--ink);
   border-radius: 2px;
@@ -117,7 +120,7 @@
 }
 .searchCol {
   position: sticky;
-  top: calc(var(--shell-h) + var(--s-4));
+  top: calc(var(--bar-stick) + var(--s-4));
   display: grid;
   gap: var(--s-2);
 }
@@ -184,4 +187,8 @@
   .resultList { max-height: 260px; }
 }
 
-#drivers { scroll-margin-top: calc(var(--shell-h) + var(--s-5)); }
+#drivers { scroll-margin-top: calc(var(--bar-stick) + var(--s-5)); }
+
+@media (pointer: coarse) {
+  .linkBtn { min-height: 44px; }
+}
