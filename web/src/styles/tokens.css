@@ -31,8 +31,9 @@
   --team-2: #bfc6cc;
   --on-team: #ffffff;
   --on-team-muted: #d7d7d7;
-  --twill-fill: #bfc6cc;
-  --twill-edge: #121212;
+  --twill-fill: #ffffff;
+  --twill-inner: #121212;
+  --twill-outer: #bfc6cc;
 
   /* type */
   --font-ui: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -60,7 +61,8 @@
   --shell-h: 64px;
   --content-max: 1320px;
 
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --dur-fast: 140ms;
   --dur: 220ms;
 }

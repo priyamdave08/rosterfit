@@ -56,15 +56,15 @@ export function DraftRoom() {
 
   return (
     <>
-      <PageHeader title="Draft Room" purpose={`Grade every college prospect on his own numbers, then test how each one fits the ${teamInfo?.name ?? team} lineups.`} />
-      <div className={s.filters} role="group" aria-label="Board filters">
+      <PageHeader title={`Draft Room, ${teamInfo?.name ?? team}`} />
+      <Section first title="Big board" description="Grade = percentile of expected 4-year VORP among college draftees since 2010, from college stats only (draft slot is not an input). Select a name for his report.">
+        <div className={s.filters} role="group" aria-label="Board filters">
         <Slider label="Min. college minutes" value={minMin} min={0} max={1500} step={50} onChange={setMinMin} />
         <Slider label="Min. draftability" value={minDraft} min={0} max={1} step={0.05} onChange={setMinDraft} format={(v) => v.toFixed(2)} help="Probability of being drafted, from a model of every final college season since 2010." />
         <Checks<Cls> label="Class" options={[...CLASSES]} value={classes} onChange={setClasses} />
         <TextField label="Search name" value={q} onChange={setQ} placeholder="e.g. Bidunga" />
       </div>
 
-      <Section title="Big board" description="Grade = percentile of expected 4-year VORP among every college draftee since 2010. College stats only: draft slot is not an input. Select a name to open his report.">
         {board.error ? (
           <ErrorState error={board.error} onRetry={() => board.refetch()} />
         ) : !board.data ? (

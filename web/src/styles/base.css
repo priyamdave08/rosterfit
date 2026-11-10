@@ -8,12 +8,15 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* keyboard focus and in-page links never land under the sticky team bar */
+  scroll-padding-top: calc(var(--shell-h) + var(--s-4));
   scrollbar-color: var(--rule) var(--ground);
 }
 
 body {
   margin: 0;
-  background: var(--ground);
+  /* home-white jersey mesh: a sparse dot weave at about 2% contrast on the flat ground */
+  background: var(--ground) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Ccircle cx='2' cy='2' r='0.9' fill='%23121212' fill-opacity='0.035'/%3E%3Ccircle cx='6' cy='6' r='0.9' fill='%23121212' fill-opacity='0.035'/%3E%3C/svg%3E");
   color: var(--ink);
   font: 400 var(--fs-md) / 1.5 var(--font-ui);
   font-feature-settings: "tnum" 1;
@@ -94,4 +97,16 @@ html.lenis body { height: auto; }
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Touch screens: every control outside running text is at least 44px tall (Taste tap-size). */
+@media (pointer: coarse) {
+  button,
+  select,
+  input:not([type="radio"]):not([type="checkbox"]):not([type="range"]),
+  summary {
+    min-height: 44px;
+  }
+  [aria-label^="About "] { min-width: 44px; display: inline-grid; place-items: center; }
+  [aria-label^="Remove "] { min-width: 44px; }
 }

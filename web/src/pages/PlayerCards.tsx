@@ -34,7 +34,7 @@ export function PlayerCards() {
 
   return (
     <>
-      <PageHeader title="Player Cards" purpose="Where a player shoots from, how efficiently, and where he ranks in the league." />
+      <PageHeader title="Player Cards" />
       <div className={s.cardsLayout}>
         <aside className={s.searchCol}>
           <TextField label="Search players" value={q} onChange={setQ} placeholder="Name or team code, e.g. wemb, Doncic, SAS" help="Matches any part of a name, ignores accents and tolerates typos. A team code lists that roster." />

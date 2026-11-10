@@ -1,21 +1,50 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import s from "./Help.module.css";
 
-/** A keyboard-reachable explanation: click or focus to show, Escape to hide. */
+const TIP_W = 280;
+const GUTTER = 16;
+
+/**
+ * A keyboard-reachable explanation: click to show, Escape or blur to hide. The tip is positioned
+ * against the viewport (so scrolling tables can't clip it) and clamped inside it.
+ */
 export function Help({ label, text }: { label: string; text: string }) {
-  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<CSSProperties | null>(null);
+  const btn = useRef<HTMLButtonElement>(null);
   const id = useId();
+  const open = pos !== null;
+
+  const show = () => {
+    const r = btn.current?.getBoundingClientRect();
+    if (!r) return;
+    const width = Math.min(TIP_W, window.innerWidth - GUTTER * 2);
+    const left = Math.min(Math.max(GUTTER, r.left + r.width / 2 - width / 2), window.innerWidth - GUTTER - width);
+    setPos({ top: r.bottom + 6, left, maxWidth: width, transformOrigin: `${r.left + r.width / 2 - left}px 0` });
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setPos(null);
+    window.addEventListener("scroll", close, { passive: true, capture: true });
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, { capture: true });
+      window.removeEventListener("resize", close);
+    };
+  }, [open]);
+
   return (
-    <span className={s.wrap} onMouseLeave={() => setOpen(false)}>
+    <span className={s.wrap}>
       <button
+        ref={btn}
         type="button"
         className={s.button}
         aria-label={`About ${label}`}
         aria-expanded={open}
         aria-describedby={open ? id : undefined}
-        onClick={() => setOpen((o) => !o)}
-        onBlur={() => setOpen(false)}
-        onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
+        onClick={() => (open ? setPos(null) : show())}
+        onBlur={() => setPos(null)}
+        onKeyDown={(e) => e.key === "Escape" && setPos(null)}
       >
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
           <circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.3" />
@@ -24,7 +53,7 @@ export function Help({ label, text }: { label: string; text: string }) {
         </svg>
       </button>
       {open && (
-        <span role="tooltip" id={id} className={s.tip}>
+        <span role="tooltip" id={id} className={s.tip} style={pos}>
           {text}
         </span>
       )}

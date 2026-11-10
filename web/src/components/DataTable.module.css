@@ -44,3 +44,5 @@ tbody tr:hover td { background: color-mix(in srgb, var(--surface-sunk) 55%, var(
 .sortBtn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .sortBtn:hover { color: var(--ink); }
 .glyph { flex: none; }
+.headCell { display: inline-flex; align-items: center; gap: 2px; }
+.right .headCell { justify-content: flex-end; }

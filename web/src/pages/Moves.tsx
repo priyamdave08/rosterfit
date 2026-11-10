@@ -34,10 +34,8 @@ export function Moves() {
 
   return (
     <>
-      <PageHeader
-        title="Signings and Trades"
-        purpose="Add or remove players and re-score every lineup with the same model the Draft Room uses. Fit is measured against this roster, not in a vacuum."
-      />
+      <PageHeader title={`Signings and Trades, ${teamInfo?.name ?? team}`} />
+      <Section first title="Evaluate a move" description="Add or remove players and re-score every lineup with the same model the Draft Room uses. Fit is measured against this roster.">
       <div className={s.controls}>
         <Segmented<Mode>
           label="Move type"
@@ -89,6 +87,7 @@ export function Moves() {
           {move.error && <ErrorState error={move.error} onRetry={() => move.mutate()} />}
         </div>
       )}
+      </Section>
 
       {r && (
         <Section title="Result">

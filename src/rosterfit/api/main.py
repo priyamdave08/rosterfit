@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import math
 import os
+from contextlib import asynccontextmanager
 from typing import Any
 
 import numpy as np
@@ -18,7 +19,18 @@ from rosterfit.engine.context import Context, get_context
 from rosterfit.engine.fit import best_lineups, compare_candidates, evaluate_move
 from rosterfit.features.players import PROFILE_COLS
 
-app = FastAPI(title="RosterFit API", version="0.1.0",
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    # A hosted deploy starts with no warehouse: fetch the verified demo bundle before serving.
+    # Locally the warehouse exists and this is a no-op.
+    from rosterfit import demo_data
+
+    demo_data.ensure_demo_data()
+    yield
+
+
+app = FastAPI(title="RosterFit API", version="0.1.0", lifespan=lifespan,
               description="NBA lineup optimisation and draft / free-agent / trade fit engine.")
 # The React front end runs on another origin (Vite dev server locally, Vercel in production).
 app.add_middleware(CORSMiddleware, allow_methods=["GET", "POST"], allow_headers=["Content-Type"],

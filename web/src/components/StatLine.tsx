@@ -11,6 +11,8 @@ export interface Stat {
   suffix?: string;
   help?: string;
   delta?: string;
+  /** Where the evidence for this number lives on the page (one click away). */
+  evidence?: { href: string; label: string };
 }
 
 function textValue(st: Stat): string {
@@ -45,7 +47,7 @@ export function StatLine({ stats }: { stats: Stat[] }) {
                     textColor="currentColor"
                     tabular
                     intro={false}
-                    duration={0.55}
+                    duration={0.3}
                   />
                 </span>
               </>
@@ -54,6 +56,11 @@ export function StatLine({ stats }: { stats: Stat[] }) {
             )}
             {st.delta && <span className={s.delta}>{st.delta}</span>}
           </dd>
+          {st.evidence && (
+            <a className={s.evidence} href={st.evidence.href}>
+              {st.evidence.label}
+            </a>
+          )}
         </div>
       ))}
     </dl>

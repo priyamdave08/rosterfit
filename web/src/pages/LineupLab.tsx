@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { get, post } from "../lib/api";
 import { fixed, pct, signed } from "../lib/format";
+import { scrollToElement } from "../lib/motion";
 import { useTeam } from "../lib/team";
 import type { CustomLineup, LineupDetail, LineupList, Person, RosterPlayer } from "../lib/types";
 import { Button, PageHeader, Section, Segmented, TextField } from "../components/Controls";
@@ -43,6 +44,11 @@ export function LineupLab() {
   const { team, teamInfo, meta } = useTeam();
   const lineups = useQuery({ queryKey: ["lineups", team], queryFn: () => get<LineupList>(`/ui/teams/${team}/lineups`, { top: 15 }) });
   const [inspect, setInspect] = useState(1); // page remounts per team (App keys it), so this starts at #1
+  const courtRef = useRef<HTMLDivElement>(null);
+  const select = (rank: number) => {
+    setInspect(rank);
+    if (courtRef.current && window.matchMedia("(max-width: 1080px)").matches) scrollToElement(courtRef.current);
+  };
   const row = lineups.data?.lineups.find((l) => l.rank === inspect) ?? lineups.data?.lineups[0];
   const detail = useQuery({
     queryKey: ["lineup-detail", row?.ids.join(",")],
@@ -53,17 +59,11 @@ export function LineupLab() {
 
   return (
     <>
-      <PageHeader
-        title="Lineup Lab"
-        purpose={`Every realistic five-man unit from the ${teamInfo?.name ?? team} top-11 rotation, scored by the lineup model. Pick one to see its spacing, or build your own.`}
-      />
+      <PageHeader title={`Lineup Lab, ${teamInfo?.name ?? team}`} />
       <Section
+        first
         title="Best five-man units"
-        description={
-          lineups.data
-            ? `${lineups.data.count.toLocaleString()} realistic combinations, ranked by projected net rating (points per 100 possessions). Off and Def are relative to league average; positive is better. Select a unit to inspect it.`
-            : "Ranked by projected net rating per 100 possessions."
-        }
+        description={`${lineups.data ? lineups.data.count.toLocaleString() : "Every"} realistic units from the ${teamInfo?.name ?? team} top 11, ranked by projected net per 100 possessions. Off and Def are vs league average.`}
       >
         {lineups.isLoading ? (
           <Skeleton height={520} label="Scoring every five-man combination" />
@@ -71,8 +71,11 @@ export function LineupLab() {
           <ErrorState error={lineups.error} onRetry={() => lineups.refetch()} />
         ) : (
           <div className={s.split}>
-            <LineupTable rows={lineups.data!.lineups} caption="Best five-man units" selected={row?.rank} onSelect={(r) => setInspect(r.rank)} shooterHelp={meta?.shooter_help} />
-            <div className={s.stickyCol}>
+            <LineupTable rows={lineups.data!.lineups} caption="Best five-man units" selected={row?.rank} onSelect={(r) => select(r.rank)} shooterHelp={meta?.shooter_help} />
+            <div className={s.stickyCol} ref={courtRef}>
+              <p className="visually-hidden" aria-live="polite">
+                {row ? `Showing unit ${row.rank}: ${row.players.map((p) => p.name).join(", ")}` : ""}
+              </p>
               {detail.data ? (
                 <>
                   <UnitStats detail={detail.data} />
@@ -88,7 +91,7 @@ export function LineupLab() {
         )}
       </Section>
       {detail.data && (
-        <div className={s.pair}>
+        <div className={s.pair} id="drivers">
           <DriverBars title={`What drives unit #${row?.rank}'s rating`} axisLabel="Effect on net rating" rows={detail.data.drivers.map((d) => ({ label: d.label, value: d.net_impact ?? 0 }))} />
           <ShareBars title="Shot diet (usage-weighted)" rows={detail.data.shot_diet.map((d) => ({ label: d.zone, value: d.share }))} />
         </div>
@@ -105,7 +108,7 @@ function UnitStats({ detail }: { detail: LineupDetail }) {
   return (
     <StatLine
       stats={[
-        { label: "Net rating", value: m.net, signed: true, help: "Projected points per 100 possessions vs opponents" },
+        { label: "Net rating", value: m.net, signed: true, help: "Projected points per 100 possessions vs opponents", evidence: { href: "#drivers", label: "What drives it" } },
         { label: "Offense vs avg", value: m.off, signed: true, help: "Positive = better than league-average offense" },
         { label: "Defense vs avg", value: m.def, signed: true, help: "Positive = better than league-average defense" },
         { label: "Volume shooters", value: m.shooters, decimals: 0, help: meta?.shooter_help },
@@ -279,7 +282,7 @@ function SavedLineups({ saved, onRemove }: { saved: Saved[]; onRemove: (i: numbe
             header: "",
             render: (x) => (
               <Button onClick={() => onRemove(x.i)} aria-label={`Remove ${x.sv.name}`}>
-                Remove
+                Remove lineup
               </Button>
             ),
           },

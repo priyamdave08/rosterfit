@@ -89,7 +89,7 @@
 .prose strong { color: var(--ink); }
 @media (max-width: 1080px) {
   .split { grid-template-columns: 1fr; }
-  .stickyCol { position: static; }
+  .stickyCol { position: static; order: -1; }
 }
 @media (max-width: 860px) {
   .pair, .three { grid-template-columns: 1fr; }
@@ -183,3 +183,5 @@
   .searchCol { position: static; }
   .resultList { max-height: 260px; }
 }
+
+#drivers { scroll-margin-top: calc(var(--shell-h) + var(--s-5)); }

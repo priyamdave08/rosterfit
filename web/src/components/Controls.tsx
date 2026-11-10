@@ -85,9 +85,9 @@ export function Checks<T extends string>({ label, options, value, onChange }: { 
   );
 }
 
-export function Section({ title, description, actions, children }: { title: string; description?: ReactNode; actions?: ReactNode; children: ReactNode }) {
+export function Section({ title, description, actions, children, first }: { title: string; description?: ReactNode; actions?: ReactNode; children: ReactNode; first?: boolean }) {
   return (
-    <section className={s.section}>
+    <section className={`${s.section} ${first ? s.first : ""}`}>
       <div className={s.sectionHead}>
         <div>
           <h2>{title}</h2>
@@ -100,11 +100,7 @@ export function Section({ title, description, actions, children }: { title: stri
   );
 }
 
-export function PageHeader({ title, purpose }: { title: string; purpose: string }) {
-  return (
-    <div className={s.pageHead}>
-      <h1>{title}</h1>
-      <p className={s.purpose}>{purpose}</p>
-    </div>
-  );
+/** The page's H1 for assistive tech; the active tab already shows the name, so it isn't repeated visually. */
+export function PageHeader({ title }: { title: string }) {
+  return <h1 className="visually-hidden">{title}</h1>;
 }

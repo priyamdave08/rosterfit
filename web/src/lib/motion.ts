@@ -10,7 +10,8 @@ let lenis: Lenis | null = null;
 
 export function startSmoothScroll(): () => void {
   if (prefersReducedMotion() || lenis) return () => undefined;
-  lenis = new Lenis({ duration: 0.9, easing: (t) => 1 - Math.pow(1 - t, 4), smoothWheel: true });
+  // Light smoothing only: a high lerp keeps the wheel responsive in a tool scrolled all day.
+  lenis = new Lenis({ lerp: 0.18, smoothWheel: true });
   const tick = (time: number) => lenis?.raf(time * 1000);
   gsap.ticker.add(tick);
   gsap.ticker.lagSmoothing(0);
@@ -24,4 +25,10 @@ export function startSmoothScroll(): () => void {
 export function scrollToTop(): void {
   if (lenis) lenis.scrollTo(0, { immediate: true });
   else window.scrollTo(0, 0);
+}
+
+/** Bring an element into view, smoothly unless the visitor asked for reduced motion. */
+export function scrollToElement(el: HTMLElement, offset = -80): void {
+  if (lenis) lenis.scrollTo(el, { offset, duration: 0.45 });
+  else el.scrollIntoView({ block: "start", behavior: prefersReducedMotion() ? "auto" : "smooth" });
 }

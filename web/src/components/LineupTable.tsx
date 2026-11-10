@@ -45,9 +45,9 @@ export function LineupTable({ rows, caption, selected, onSelect, shooterHelp, co
         );
       },
     },
-    { key: "net", header: "Net", sortValue: (r) => r.net, render: (r) => <strong>{signed(r.net)}</strong>, help: "Projected net rating per 100 possessions" },
-    { key: "off", header: "Off", sortValue: (r) => r.off, render: (r) => signed(r.off), help: "Offense vs league average (positive = better)" },
-    { key: "def", header: "Def", sortValue: (r) => r.def, render: (r) => signed(r.def), help: "Defense vs league average (positive = better)" },
+    { key: "net", header: "Net", sortValue: (r) => r.net, render: (r) => <strong>{signed(r.net)}</strong> },
+    { key: "off", header: "Off", sortValue: (r) => r.off, render: (r) => signed(r.off) },
+    { key: "def", header: "Def", sortValue: (r) => r.def, render: (r) => signed(r.def) },
     { key: "shooters", header: "Shooters", sortValue: (r) => r.shooters, render: (r) => r.shooters.toFixed(0), help: shooterHelp },
     { key: "spacing", header: "Spacing", sortValue: (r) => r.spacing, render: (r) => r.spacing.toFixed(2), help: "Volume-weighted 3P% above 30%" },
     { key: "usage", header: "Usage", sortValue: (r) => r.usage_total, render: (r) => r.usage_total.toFixed(0), help: "Sum of the five usage rates (100 = balanced)" },

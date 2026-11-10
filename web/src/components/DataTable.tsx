@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
+import { Help } from "./Help";
 import s from "./DataTable.module.css";
 
 export interface Column<T> {
@@ -65,8 +66,8 @@ export function DataTable<T>({ columns, rows, rowKey, caption, initialSort, maxH
                   className={c.align === "left" ? s.left : s.right}
                   style={c.width ? { width: c.width } : undefined}
                   aria-sort={active === "asc" ? "ascending" : active === "desc" ? "descending" : undefined}
-                  title={c.help}
                 >
+                  <span className={s.headCell}>
                   {c.sortValue ? (
                     <button
                       type="button"
@@ -83,6 +84,8 @@ export function DataTable<T>({ columns, rows, rowKey, caption, initialSort, maxH
                   ) : (
                     c.header
                   )}
+                  {c.help && <Help label={c.header} text={c.help} />}
+                  </span>
                 </th>
               );
             })}

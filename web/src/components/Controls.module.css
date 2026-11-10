@@ -8,23 +8,27 @@
   font-weight: 600;
   font-size: var(--fs-sm);
   cursor: pointer;
-  transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  transition: transform 160ms var(--ease-out), background-color var(--dur-fast) ease, border-color var(--dur-fast) ease;
   white-space: nowrap;
 }
+.btn:active:not(:disabled) { transform: scale(0.97); }
 .btn:disabled { cursor: not-allowed; }
 .primary {
   background: var(--ink);
   color: var(--ground);
   border: 1px solid var(--ink);
 }
-.primary:hover:not(:disabled) { background: #2b2b2b; }
+@media (hover: hover) and (pointer: fine) {
+  .primary:hover:not(:disabled) { background: #2b2b2b; }
+  .secondary:hover:not(:disabled) { border-color: var(--ink-2); background: var(--surface-sunk); }
+  .seg:hover { background: var(--surface-sunk); }
+}
 .primary:disabled { background: var(--rule); border-color: var(--rule); color: var(--ink-2); }
 .secondary {
   background: var(--surface);
   color: var(--ink);
   border: 1px solid var(--rule);
 }
-.secondary:hover:not(:disabled) { border-color: var(--ink-2); background: var(--surface-sunk); }
 .secondary:disabled { color: var(--muted); }
 .btn[aria-busy="true"] { cursor: progress; }
 .spinner {
@@ -76,7 +80,6 @@
 .seg:last-child { border-right: 0; }
 .seg input { position: absolute; opacity: 0; inset: 0; cursor: pointer; margin: 0; }
 .seg:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: -2px; }
-.seg:hover { background: var(--surface-sunk); }
 .segOn,
 .segOn:hover { background: var(--ink); color: var(--ground); }
 
@@ -93,6 +96,8 @@
   display: grid;
   gap: var(--s-4);
 }
+.first { margin-top: 0; }
+.first .sectionHead { border-top: 0; padding-top: 0; }
 .sectionHead {
   display: flex;
   justify-content: space-between;

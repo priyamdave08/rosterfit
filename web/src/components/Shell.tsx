@@ -32,7 +32,15 @@ export function Shell({ children }: { children: ReactNode }) {
       </a>
       <header className={s.bar}>
         <div className={s.inner}>
-          <span className={s.mark}>RosterFit</span>
+          <svg className={s.mark} viewBox="0 0 164 30" width="164" height="30" role="img" aria-label="RosterFit">
+            {/* the wordmark in two-layer twill: outer outline in the team's secondary, fill in the bar's text color */}
+            <text x="2" y="23" fill="var(--team-2)" stroke="var(--team-2)" strokeWidth="3.2" strokeLinejoin="round" paintOrder="stroke">
+              RosterFit
+            </text>
+            <text x="2" y="23" fill="var(--on-team)" stroke="var(--team)" strokeWidth="1.4" strokeLinejoin="round" paintOrder="stroke">
+              RosterFit
+            </text>
+          </svg>
           <nav className={s.tabs} aria-label="Workspaces" data-lenis-prevent>
             {TABS.map((t) => (
               <NavLink

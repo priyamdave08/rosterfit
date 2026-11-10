@@ -36,8 +36,8 @@ export function ModelCardPage() {
   ];
   return (
     <>
-      <PageHeader title="Model Card" purpose="How the two models are trained, and how well they predict on seasons and draft classes they never saw." />
-      <Section title="Lineup efficiency model">
+      <PageHeader title="Model Card" />
+      <Section first title="Lineup efficiency model" description="How the two models are trained, and how well they predict on seasons and draft classes they never saw.">
         <div className={s.prose}>
           <p>
             Predicts a lineup's offensive and defensive rating (per 100 possessions, vs league average) from the five players' <strong>prior-season</strong> profiles. Trained on every

@@ -18,12 +18,20 @@
 .incoming { fill: color-mix(in srgb, var(--ok) 14%, transparent); stroke: var(--ok); }
 .marker {
   position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.markerInner {
+  position: absolute;
+  left: 0;
+  top: 0;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  pointer-events: none;
 }
 .name {
   font: 600 var(--fs-xs) / 1.2 var(--font-ui);

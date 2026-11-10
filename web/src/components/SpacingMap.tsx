@@ -23,28 +23,37 @@ export function SpacingMap({ detail, title }: { detail: LineupDetail; title: str
     const el = root.current;
     if (!el) return;
     const now = new Map(detail.spacing.players.map((sp) => [sp.id ?? sp.player, { x: sp.x, y: sp.y, r: sp.radius }]));
-    if (!prefersReducedMotion() && prev.current.size) {
-      const ctx = gsap.context(() => {
-        for (const [key, pos] of now) {
-          const marker = el.querySelector<HTMLElement>(`[data-key="${CSS.escape(key)}"]`);
-          const ring = el.querySelector<SVGCircleElement>(`circle[data-key="${CSS.escape(key)}"]`);
-          const before = prev.current.get(key);
-          if (!marker || !ring) continue;
-          if (before) {
-            gsap.fromTo(marker, { left: `${pctX(before.x)}%`, top: `${pctY(before.y)}%` },
-              { left: `${pctX(pos.x)}%`, top: `${pctY(pos.y)}%`, duration: 0.5, ease: "expo.out" });
-            gsap.fromTo(ring, { attr: { cx: sx(before.x), cy: sy(before.y), r: before.r } },
-              { attr: { cx: sx(pos.x), cy: sy(pos.y), r: pos.r }, duration: 0.5, ease: "expo.out" });
-          } else {
-            gsap.fromTo(marker, { opacity: 0, scale: 0.86 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out", delay: 0.08 });
-            gsap.fromTo(ring, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "expo.out", delay: 0.08 });
-          }
+    const reduced = prefersReducedMotion();
+    const ctx = gsap.context(() => {
+      if (reduced) return;
+      for (const [key, pos] of now) {
+        const marker = el.querySelector<HTMLElement>(`[data-key="${CSS.escape(key)}"]`);
+        const ring = el.querySelector<SVGCircleElement>(`circle[data-key="${CSS.escape(key)}"]`);
+        if (!marker || !ring) continue;
+        const before = prev.current.get(key);
+        if (before) {
+          // On-screen movement: transform only, strong ease-in-out, under 300ms.
+          const layer = marker.parentElement!;
+          const dx = ((pctX(before.x) - pctX(pos.x)) / 100) * layer.clientWidth;
+          const dy = ((pctY(before.y) - pctY(pos.y)) / 100) * layer.clientHeight;
+          if (dx || dy) gsap.fromTo(marker, { x: dx, y: dy }, { x: 0, y: 0, duration: 0.28, ease: "power4.inOut" });
+          if (before.x !== pos.x || before.y !== pos.y || before.r !== pos.r)
+            gsap.fromTo(ring, { attr: { cx: sx(before.x), cy: sy(before.y), r: before.r } }, { attr: { cx: sx(pos.x), cy: sy(pos.y), r: pos.r }, duration: 0.28, ease: "power4.inOut" });
+        } else if (prev.current.size) {
+          // A player new to the unit settles in from 95% (never from nothing).
+          gsap.fromTo(marker, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.2, ease: "power3.out" });
+          gsap.fromTo(ring, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power3.out" });
         }
-      }, el);
-      prev.current = now;
-      return () => ctx.revert();
-    }
+        // An incoming player's outer twill layer stitches itself on, once.
+        if (key === detail.highlight && !before) {
+          const stitch = marker.querySelector<SVGTextElement>("[data-stitch]");
+          if (stitch)
+            gsap.fromTo(stitch, { strokeDasharray: 240, strokeDashoffset: 240 }, { strokeDashoffset: 0, duration: 0.6, ease: "power3.out", delay: 0.1, clearProps: "strokeDasharray,strokeDashoffset" });
+        }
+      }
+    }, el);
     prev.current = now;
+    return () => ctx.revert();
   }, [detail]);
 
   const { perimeter_threats, paint_bodies, congested } = detail.spacing;
@@ -65,11 +74,13 @@ export function SpacingMap({ detail, title }: { detail: LineupDetail; title: str
           const isNew = detail.highlight != null && sp.id === detail.highlight;
           return (
             <div key={key} data-key={key} className={s.marker} style={{ left: `${pctX(sp.x)}%`, top: `${pctY(sp.y)}%` }}>
-              <Twill person={person} size="md" incoming={isNew} />
-              <span className={s.name}>
-                {"short" in person ? person.short : sp.player}
-                {isNew && <span className={s.newTag}> (new)</span>}
-              </span>
+              <div className={s.markerInner}>
+                <Twill person={person} size="md" incoming={isNew} />
+                <span className={s.name}>
+                  {"short" in person ? person.short : sp.player}
+                  {isNew && <span className={s.newTag}> (new)</span>}
+                </span>
+              </div>
             </div>
           );
         })}

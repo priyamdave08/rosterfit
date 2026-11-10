@@ -42,3 +42,9 @@
   .line { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   .value { font-size: 1.5rem; }
 }
+.evidence {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}

@@ -40,11 +40,16 @@ export interface Colorway {
   team2: string;
   onTeam: string;
   onTeamMuted: string;
+  /** Tackle-twill numeral layers: fill, inner outline, outer outline. Each layer clears 3:1
+   *  against the one it sits on, and the inner outline clears 3:1 against the page ground. */
   twillFill: string;
-  twillEdge: string;
+  twillInner: string;
+  twillOuter: string;
 }
 
-/** Shell = primary; stitching = secondary; numerals = the secondary (or white/ink) on primary. */
+const GROUND = "#f5f4ef";
+
+/** Shell = primary; stitching = secondary; numerals = layered twill in the team's colors. */
 export function colorway(primary: string, secondary: string): Colorway {
   let team = primary.toLowerCase();
   // A very light primary (rare) can't carry white type or read as a shell; deepen it.
@@ -52,8 +57,14 @@ export function colorway(primary: string, secondary: string): Colorway {
   const onTeam = textOn(team);
   const onTeamMuted = mix(onTeam, team, 0.25);
   const sec = secondary.toLowerCase();
-  const twillFill = contrast(sec, team) >= 3 ? sec : onTeam;
-  return { team, team2: sec, onTeam, onTeamMuted, twillFill, twillEdge: team };
+  // Inner outline: the team color when it holds its own on the page, otherwise ink.
+  const twillInner = contrast(team, GROUND) >= 3 ? team : INK;
+  // Fill: whichever of white or the secondary reads best inside that outline.
+  const fills = [WHITE, sec].filter((c) => contrast(c, twillInner) >= 3);
+  const twillFill = fills.sort((a, b) => contrast(b, twillInner) - contrast(a, twillInner))[0] ?? textOn(twillInner);
+  // Outer outline: the secondary when it is distinct from the inner outline, otherwise a quiet rule.
+  const twillOuter = contrast(sec, twillInner) >= 1.6 && sec !== twillFill ? sec : mix(twillInner, GROUND, 0.55);
+  return { team, team2: sec, onTeam, onTeamMuted, twillFill, twillInner, twillOuter };
 }
 
 export function applyColorway(c: Colorway, el: HTMLElement = document.documentElement): void {
@@ -62,7 +73,8 @@ export function applyColorway(c: Colorway, el: HTMLElement = document.documentEl
   el.style.setProperty("--on-team", c.onTeam);
   el.style.setProperty("--on-team-muted", c.onTeamMuted);
   el.style.setProperty("--twill-fill", c.twillFill);
-  el.style.setProperty("--twill-edge", c.twillEdge);
+  el.style.setProperty("--twill-inner", c.twillInner);
+  el.style.setProperty("--twill-outer", c.twillOuter);
 }
 
 /** Diverging cold to hot for "vs league average" (shot zones, FG% diff in points). */

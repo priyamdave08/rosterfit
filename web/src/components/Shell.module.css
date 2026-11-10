@@ -30,12 +30,10 @@
   gap: var(--s-6);
 }
 .mark {
-  font: 400 1.25rem/1 var(--font-twill);
-  letter-spacing: 0.03em;
-  color: var(--twill-fill);
-  -webkit-text-stroke: 1px var(--twill-edge);
-  paint-order: stroke fill;
-  white-space: nowrap;
+  flex: none;
+  font: 400 21px/1 var(--font-twill);
+  letter-spacing: 0.02em;
+  overflow: visible;
 }
 .tabs {
   display: flex;
@@ -96,8 +94,13 @@
 }
 @media (max-width: 900px) {
   .inner { gap: var(--s-4); padding: 0 var(--s-4); height: auto; min-height: var(--shell-h); flex-wrap: wrap; padding-top: var(--s-2); padding-bottom: var(--s-2); }
-  .tabs { order: 3; width: 100%; }
-  .team select { min-width: 0; width: 180px; }
+  .tabs { order: 3; width: 100%; flex-wrap: wrap; overflow: visible; }
+  .teamLabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .team select { min-width: 0; width: 190px; }
   .main { padding: var(--s-5) var(--s-4) var(--s-6); }
   .footer { padding: var(--s-4); }
+}
+@media (max-width: 420px) {
+  .team select { width: 160px; }
+  .mark { width: 140px; height: auto; }
 }
