@@ -19,8 +19,8 @@ import numpy as np
 import pandas as pd
 
 from rosterfit.engine.context import Context
-from rosterfit.engine.optimizer import realistic, score_lineups
-from rosterfit.features.lineups import lineup_features
+from rosterfit.engine.optimizer import score_lineups
+from rosterfit.features.lineups import lineup_features_batch, realistic_mask
 from rosterfit.features.players import PROFILE_COLS
 
 FIT_SCALE = 1.5  # net-rating points that move fit_score from 50 to ~73
@@ -70,24 +70,27 @@ def league_replacement_gain(ctx: Context, cand: pd.Series, teams: list[str] | No
     """Net-rating gain from inserting ``cand`` into each team's current best lineup,
     replacing whichever starter it helps most to replace."""
     teams = teams or sorted(ctx.rosters["team_abbr"].unique())
-    options, owner, base = [], [], {}
-    cand_row = cand[PROFILE_COLS].astype(float).to_frame().T
+    cand_vec = cand[PROFILE_COLS].to_numpy(dtype=float)
+    trials, owner, base = [], [], {}
     for t in teams:
         best = best_lineups(ctx, t, top=1)
         if best.empty:
             continue
-        ids = best.iloc[0]["player_ids"]
-        five = ctx.players.loc[ids, PROFILE_COLS].astype(float)
+        five = ctx.players.loc[best.iloc[0]["player_ids"], PROFILE_COLS].to_numpy(dtype=float)
         base[t] = best.iloc[0]["net_rtg"]
-        for out_id in ids:
-            trial = pd.concat([five.drop(index=out_id), cand_row])
-            if realistic(trial):
-                options.append(lineup_features(trial.reset_index(drop=True)))
-                owner.append(t)
-    if not options:
+        for slot in range(5):  # the candidate replaces each starter in turn
+            trial = five.copy()
+            trial[slot] = cand_vec
+            trials.append(trial)
+            owner.append(t)
+    if not trials:
         return np.array([])
-    pred = ctx.lineup_model.predict_frame(pd.DataFrame(options))["net_rtg"]  # one batched call
-    best_after = pred.groupby(np.array(owner)).max()
+    P = np.stack(trials)
+    keep = realistic_mask(P[:, :, PROFILE_COLS.index("pos_num")])
+    if not keep.any():
+        return np.array([])
+    pred = ctx.lineup_model.predict_frame(lineup_features_batch(P[keep], PROFILE_COLS))["net_rtg"]
+    best_after = pd.Series(pred.to_numpy()).groupby(np.array(owner)[keep]).max()
     return np.array([best_after[t] - base[t] for t in best_after.index])
 
 

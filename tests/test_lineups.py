@@ -66,3 +66,29 @@ def test_optimizer_finds_best_talent_lineup(roster):
 def test_optimizer_respects_must_include(roster):
     out = score_lineups(BpmModel(), roster, must_include=["p6"], top=None)
     assert all("p6" in ids for ids in out["player_ids"])
+
+
+def test_batch_features_match_per_lineup_exactly(roster):
+    """The vectorised optimiser path must give bit-identical features to lineup_features."""
+    from itertools import combinations
+
+    from rosterfit.features.lineups import lineup_features_batch
+
+    prof = roster[PROFILE_COLS].astype(float).reset_index(drop=True)
+    combos = list(combinations(range(len(prof)), 5))
+    batch = lineup_features_batch(prof.to_numpy()[np.array(combos)], PROFILE_COLS)
+    for i, c in enumerate(combos):
+        single = lineup_features(prof.iloc[list(c)].reset_index(drop=True))
+        assert batch.iloc[i].to_dict() == pytest.approx(single, rel=0, abs=0, nan_ok=True)
+
+
+def test_batch_threshold_boundary_matches(roster):
+    """avg_pos landing exactly on 3.6 must be classified the same way by both paths."""
+    from rosterfit.features.lineups import lineup_features_batch
+
+    five = roster.iloc[:5][PROFILE_COLS].astype(float).reset_index(drop=True)
+    five["pos_num"] = [3.4, 3.6, 3.7, 3.5, 3.8]            # mean is 3.6 up to float rounding
+    single = lineup_features(five)
+    batch = lineup_features_batch(five.to_numpy()[None], PROFILE_COLS).iloc[0]
+    assert batch["too_big"] == single["too_big"]
+    assert batch["avg_pos"] == single["avg_pos"]

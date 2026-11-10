@@ -106,6 +106,75 @@ def lineup_features(players: pd.DataFrame, weights: np.ndarray | None = None) ->
     return f
 
 
+def realistic_mask(pos: np.ndarray) -> np.ndarray:
+    """Vectorised lineup sanity check on an (n_lineups, 5) array of position numbers:
+    someone who can bring the ball up, someone with size, and a sane average."""
+    mean = pos.mean(axis=1)
+    return (pos.min(axis=1) <= 2.6) & (pos.max(axis=1) >= 3.9) & (mean >= 2.2) & (mean <= 3.8)
+
+
+def lineup_features_batch(P: np.ndarray, cols: list[str]) -> pd.DataFrame:
+    """Equal-weight features for many five-man lineups at once.
+
+    ``P`` has shape (n_lineups, 5, len(cols)). Gives the same values as calling
+    :func:`lineup_features` on each lineup (tests enforce this) but in a handful of
+    NumPy operations instead of thousands of small DataFrames, which is what makes
+    the optimiser and the league-wide synergy baseline fast.
+    """
+    ix = {c: i for i, c in enumerate(cols)}
+
+    def col(c: str) -> np.ndarray:
+        return P[:, :, ix[c]]
+
+    # Same arithmetic as lineup_features' _wmean (sum of x * w with w = 1/5), not
+    # np.mean: the two can differ in the last bit, which flips threshold features
+    # such as too_big (avg_pos > 3.6) exactly at the boundary.
+    w = np.full(P.shape[1], 1.0 / P.shape[1])
+    w = w / w.sum()
+
+    def mean(x: np.ndarray) -> np.ndarray:
+        return (x * w).sum(axis=1)
+
+    f: dict[str, np.ndarray] = {f"avg_{c}": mean(col(c)) for c in TALENT}
+    f["n_shooters"] = 5 * mean((col("fg3a_per_poss") >= SHOOTER_3PA100) & (col("fg3_pct_eb") >= SHOOTER_3P))
+    f["n_creators"] = 5 * mean((col("ast_pct") >= CREATOR_AST) & (col("usg_pct") >= CREATOR_USG))
+    f["n_rim_protectors"] = 5 * mean(col("blk_pct") >= RIM_PROTECTOR_BLK)
+    f["n_non_shooters"] = 5 * mean(col("fg3a_rate") < NON_SHOOTER_3PAR)
+    f["n_bigs"] = 5 * mean(col("pos_num") >= BIG_POS)
+    f["n_stars"] = 5 * mean(col("bpm") >= 4.0)
+    f["n_weak_links"] = 5 * mean(col("bpm") <= -2.0)
+    f["n_high_usage"] = 5 * mean(col("usg_pct") >= 27.0)
+    f["spacing_index"] = 5 * mean(col("fg3a_per_poss") * (col("fg3_pct_eb") - 0.30))
+    for c in ("fg3a_rate", "corner3_share", "rim_freq", "rim_fg", "mid_freq"):
+        f[f"avg_{c}"] = mean(col(c))
+
+    usage_total = 5 * f["avg_usg_pct"]
+    f["usage_total"] = usage_total
+    f["usage_overload"] = np.maximum(0.0, usage_total - 105.0)
+    f["usage_vacuum"] = np.maximum(0.0, 95.0 - usage_total)
+    usg = col("usg_pct")
+    f["usage_sd"] = np.sqrt(mean((usg - f["avg_usg_pct"][:, None]) ** 2))
+    u = usg * w
+    total = u.sum(axis=1)
+    safe = np.where(total > 0, total, 1.0)
+    f["usage_hhi"] = np.where(total > 0, ((u / safe[:, None]) ** 2).sum(axis=1), 0.2)
+    f["usage_weighted_ts"] = np.where(total > 0, (col("ts_pct") * u).sum(axis=1) / safe, f["avg_ts_pct"])
+
+    pos = col("pos_num")
+    f["avg_pos"] = mean(pos)
+    f["pos_spread"] = np.sqrt(mean((pos - f["avg_pos"][:, None]) ** 2))
+    f["avg_trb_pct"] = mean(col("trb_pct"))
+
+    f["creator_x_spacing"] = np.minimum(f["n_creators"], 2.0) * f["spacing_index"]
+    f["no_creator"] = (f["n_creators"] < 0.5).astype(float)
+    f["no_rim_protector"] = (f["n_rim_protectors"] < 0.5).astype(float)
+    f["paint_clog"] = np.maximum(0.0, f["n_non_shooters"] - 1.5)
+    f["too_small"] = (f["avg_pos"] < 2.4).astype(float)
+    f["too_big"] = (f["avg_pos"] > 3.6).astype(float)
+    f["def_anchor_x_perimeter"] = np.minimum(f["n_rim_protectors"], 1.5) * f["avg_stl_pct"]
+    return pd.DataFrame(f)[FEATURE_NAMES]
+
+
 def sampled_lineup_features(players: pd.DataFrame, minutes: np.ndarray, n_samples: int = 150,
                             rng: np.random.Generator | None = None) -> dict[str, float]:
     """Expected 5-man lineup features for a team-season, by Monte Carlo.
