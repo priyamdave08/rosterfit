@@ -18,7 +18,7 @@ jobs:
       - name: Install
         run: |
           uv venv --clear --python 3.12 .venv
-          uv pip install --python .venv/bin/python -e ".[dev,aws,xgb]"
+          uv pip install --python .venv/bin/python -e ".[dev,aws,xgb,api,train]"
       - name: Lint
         run: .venv/bin/ruff check src tests
       - name: Unit tests (integration tests skip without local data)

@@ -1,0 +1,20 @@
+# Installed by Streamlit Community Cloud for the hosted demo. Versions are pinned to the
+# ones the bundled models were trained and pickled with; bump them together with a new
+# demo bundle (python -m rosterfit.demo_data build ...). Local dev uses `make install`.
+numpy==2.5.4
+pandas==3.1.1
+scipy==1.18.1
+scikit-learn==1.9.1
+joblib==1.6.0
+shap==0.54.1
+duckdb==2.0.0
+pyarrow==26.0.1
+rapidfuzz==3.14.6
+streamlit==1.67.0
+plotly==7.1.0
+requests==2.34.2
+beautifulsoup4==4.15.0
+lxml==6.1.3
+pydantic==2.14.3
+anthropic==2.7.0
+-e .

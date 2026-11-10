@@ -3,7 +3,7 @@ PY ?= .venv/bin/python
 .PHONY: install data db train all app api test lint docker synth
 
 install:          ## create venv and install everything
-	uv venv --python 3.12 .venv && uv pip install --python $(PY) -e ".[dev,aws]"
+	uv venv --python 3.12 .venv && uv pip install --python $(PY) -e ".[dev,aws,api,train]"
 
 data:             ## pull Basketball-Reference, Torvik and ESPN (cached, rate-limited)
 	$(PY) -m rosterfit.cli ingest

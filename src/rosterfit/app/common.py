@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+from rosterfit import demo_data
 from rosterfit.engine.context import Context, get_context
 from rosterfit.features.college import FEATURE_LABELS
 from rosterfit.features.league import college_zone_averages, nba_zone_averages
@@ -45,9 +46,24 @@ CHART_MARGIN = {"l": 8, "r": 8, "t": 44, "b": 8}
 
 
 # --------------------------------------------------------------------------- data
+@st.cache_resource(show_spinner="Downloading the demo data (first visit only)…")
+def _demo_bundle() -> bool:
+    return demo_data.ensure_demo_data()
+
+
 @st.cache_resource(show_spinner="Loading models and rosters (first load takes about 30 seconds)…")
-def context() -> Context:
+def _load_context() -> Context:
     return get_context()
+
+
+def context() -> Context:
+    """The shared engine context; on a fresh hosted deploy, fetches the demo bundle first."""
+    try:
+        _demo_bundle()
+    except demo_data.DemoDataError as err:
+        st.error(f"The demo data couldn't be loaded: {err}. Reload the page to try again.")
+        st.stop()
+    return _load_context()
 
 
 @st.cache_resource(show_spinner=False)

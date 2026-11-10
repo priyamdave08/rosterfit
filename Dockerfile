@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 ROSTERFIT_ROOT=/app
 
 COPY pyproject.toml README.md ./
 COPY src ./src
-RUN pip install ".[xgb,aws]"
+RUN pip install ".[xgb,aws,api,train]"
 
 COPY .streamlit ./.streamlit
 COPY docker/entrypoint.sh /entrypoint.sh
