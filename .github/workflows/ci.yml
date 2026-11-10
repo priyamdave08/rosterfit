@@ -14,9 +14,10 @@ jobs:
         with:
           python-version: "3.12"
       # The runner's system Python is "externally managed" (PEP 668), so install into a venv.
+      # --clear: setup-uv may already have created .venv from python-version.
       - name: Install
         run: |
-          uv venv --python 3.12 .venv
+          uv venv --clear --python 3.12 .venv
           uv pip install --python .venv/bin/python -e ".[dev,aws,xgb]"
       - name: Lint
         run: .venv/bin/ruff check src tests
