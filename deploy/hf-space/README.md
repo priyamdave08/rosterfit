@@ -14,7 +14,8 @@ short_description: Engine API behind the RosterFit React front end
 
 The Python engine behind [RosterFit](https://github.com/priyamdave08/rosterfit). `app.py` fetches
 the engine from GitHub, and on first boot it downloads the verified demo bundle (warehouse and
-trained models) and serves the FastAPI app on the free CPU tier. Interactive docs are at `/docs`.
+trained models) and serves the FastAPI app on the free tier (ZeroGPU hardware; the engine itself
+runs on CPU). Interactive docs are at `/docs`.
 
 The `Dockerfile` here serves the same app on any Docker host (or a Docker Space on a paid plan).
 

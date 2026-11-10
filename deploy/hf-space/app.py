@@ -11,6 +11,18 @@ import subprocess
 import sys
 from pathlib import Path
 
+try:  # present on Hugging Face Spaces; absent when this file is rehearsed locally
+    import spaces
+except ImportError:
+    spaces = None
+
+if spaces is not None:
+    # Free Gradio Spaces run on ZeroGPU hardware, which refuses to start unless at least one
+    # function is marked for the GPU. The engine runs entirely on CPU and never calls this.
+    @spaces.GPU
+    def gpu_probe() -> None:
+        return None
+
 REPO = "https://github.com/priyamdave08/rosterfit.git"
 REF = os.environ.get("ROSTERFIT_REF", "main")
 ENGINE = Path(__file__).resolve().parent / "engine"
