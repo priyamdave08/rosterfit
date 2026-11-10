@@ -5,11 +5,13 @@
 from __future__ import annotations
 
 import math
+import os
 from typing import Any
 
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from rosterfit.engine.context import Context, get_context
@@ -18,6 +20,10 @@ from rosterfit.features.players import PROFILE_COLS
 
 app = FastAPI(title="RosterFit API", version="0.1.0",
               description="NBA lineup optimisation and draft / free-agent / trade fit engine.")
+# The React front end runs on another origin (Vite dev server locally, Vercel in production).
+app.add_middleware(CORSMiddleware, allow_methods=["GET", "POST"], allow_headers=["Content-Type"],
+                   allow_origins=[o.strip() for o in os.environ.get(
+                       "ROSTERFIT_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if o.strip()])
 
 
 def clean(obj: Any) -> Any:
@@ -168,3 +174,8 @@ def model_card() -> dict:
     c = ctx()
     return clean({"lineup_model": c.lineup_model.metrics, "prospect_model": c.prospect_model.metrics,
                   "trajectory_groups": c.prospect_model.groups})
+
+
+from rosterfit.api.ui import router as ui_router  # noqa: E402
+
+app.include_router(ui_router)

@@ -169,19 +169,39 @@ def threat(p: pd.Series, spot_type: str) -> float:
     return 2.0 + 7.0 * min(_safe(p.rim_freq) * _safe(p.rim_fg, 0.6) / 0.35, 1.0)
 
 
-def spacing_map(five: pd.DataFrame, title: str = "", dark: bool = False, height: int = 560,
-                highlight: str | None = None) -> tuple[go.Figure, dict]:
-    fig = base_figure(title, height=height, dark=dark)
+PERIMETER = ("corner", "wing", "top")
+
+
+def spacing_layout(five: pd.DataFrame) -> dict:
+    """Where each of the five stands, his gravity radius, and the lineup's spacing summary.
+
+    Pure data (no drawing), shared by the Plotly map and the API so they cannot disagree.
+    """
     assigned = assign_spots(five)
     by_name = five.set_index("player")
-    perimeter_threats = 0
-    paint_bodies = 0
+    players, perimeter_threats, paint_bodies = [], 0, 0
     for name, spot in assigned:
         p = by_name.loc[name]
         x, y, kind = SPOTS[spot]
         r = threat(p, kind)
+        players.append({"player": name, "spot": spot, "x": x, "y": y, "kind": kind, "radius": r})
+        if kind in PERIMETER and r >= 6:
+            perimeter_threats += 1
+        if kind in ("dunker", "elbow") or _safe(p.fg3a_rate) < 0.15:
+            paint_bodies += 1
+    return {"assignment": assigned, "players": players, "perimeter_threats": perimeter_threats,
+            "paint_bodies": paint_bodies, "congested": paint_bodies >= 3}
+
+
+def spacing_map(five: pd.DataFrame, title: str = "", dark: bool = False, height: int = 560,
+                highlight: str | None = None) -> tuple[go.Figure, dict]:
+    fig = base_figure(title, height=height, dark=dark)
+    layout = spacing_layout(five)
+    for spot_info in layout["players"]:
+        name, spot, kind, r = spot_info["player"], spot_info["spot"], spot_info["kind"], spot_info["radius"]
+        x, y = spot_info["x"], spot_info["y"]
         is_hl = highlight is not None and name == highlight
-        color = palette.HIGHLIGHT if is_hl else (palette.PRIMARY if kind in ("corner", "wing", "top") else palette.BRAND)
+        color = palette.HIGHLIGHT if is_hl else (palette.PRIMARY if kind in PERIMETER else palette.BRAND)
         t = np.linspace(0, 2 * np.pi, 60)
         fig.add_trace(go.Scatter(x=x + r * np.cos(t), y=y + r * np.sin(t), fill="toself", mode="lines",
                                  line={"color": palette.rgba(color, 0.6), "width": 1},
@@ -190,12 +210,7 @@ def spacing_map(five: pd.DataFrame, title: str = "", dark: bool = False, height:
                                  textposition="top center", textfont={"size": 12, "color": palette.INK},
                                  marker={"size": 16, "color": color, "line": {"color": "white", "width": 2}},
                                  hovertext=f"{name}<br>{spot}<br>gravity radius {r:.1f} ft", hoverinfo="text"))
-        if kind in ("corner", "wing", "top") and r >= 6:
-            perimeter_threats += 1
-        if kind in ("dunker", "elbow") or _safe(p.fg3a_rate) < 0.15:
-            paint_bodies += 1
-    summary = {"assignment": assigned, "perimeter_threats": perimeter_threats,
-               "paint_bodies": paint_bodies, "congested": paint_bodies >= 3}
+    summary = {k: layout[k] for k in ("assignment", "perimeter_threats", "paint_bodies", "congested")}
     return fig, summary
 
 
