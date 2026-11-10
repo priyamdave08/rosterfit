@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rosterfit"
+version = "0.1.0"
+description = "NBA lineup optimization and draft / free-agent / trade fit engine"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pandas>=2.1",
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "scikit-learn>=1.4",
+  "shap>=0.45",
+  "duckdb>=1.0",
+  "pyarrow>=14",
+  "requests>=2.31",
+  "beautifulsoup4>=4.12",
+  "lxml>=5",
+  "rapidfuzz>=3",
+  "joblib>=1.3",
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.29",
+  "pydantic>=2.6",
+  "streamlit>=1.35",
+  "plotly>=5.20",
+  "mlflow>=2.12",
+]
+
+[project.optional-dependencies]
+xgb = ["xgboost>=2.0"]          # macOS needs `brew install libomp`
+shots = ["nba_api>=1.4"]        # optional shot-location (x, y) charts from stats.nba.com
+aws = ["boto3>=1.34", "anthropic>=2.0"]   # S3 / Athena data lake + Claude scouting reports (Bedrock or API)
+dev = ["pytest>=8", "ruff>=0.4", "httpx>=0.27", "moto[s3,athena]>=5", "boto3>=1.34", "anthropic>=2.0"]
+
+[project.scripts]
+rosterfit = "rosterfit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rosterfit = ["db/sql/*.sql"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

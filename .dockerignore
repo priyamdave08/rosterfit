@@ -1,0 +1,11 @@
+.venv
+.git
+.github
+.ruff_cache
+.pytest_cache
+**/__pycache__
+data
+infra/cdk.out
+notebooks
+tests
+*.egg-info
