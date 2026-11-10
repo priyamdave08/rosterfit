@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { scrollToTop } from "../lib/motion";
+import { preloadRoute } from "../lib/routes";
 import { useTeam } from "../lib/team";
 import s from "./Shell.module.css";
 
@@ -45,8 +46,10 @@ export function Shell({ children }: { children: ReactNode }) {
             {TABS.map((t) => (
               <NavLink
                 key={t.to}
-                to={{ pathname: t.to, search: location.search }}
+                to={{ pathname: t.to, search: `?team=${team}` }}
                 end={t.end}
+                onMouseEnter={() => preloadRoute(t.to)}
+                onFocus={() => preloadRoute(t.to)}
                 className={({ isActive }) => `${s.tab} ${isActive ? s.active : ""}`}
               >
                 {t.label}

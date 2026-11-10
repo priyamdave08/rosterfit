@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { get, post } from "../lib/api";
 import { signed } from "../lib/format";
+import { scrollToElement } from "../lib/motion";
 import { useTeam } from "../lib/team";
 import type { MovePool, MoveResult } from "../lib/types";
-import { Button, PageHeader, Section, Segmented } from "../components/Controls";
+import { Button, LeadSection, PageHeader, Section, Segmented } from "../components/Controls";
 import { DataTable } from "../components/DataTable";
 import { LineupPanel } from "../components/LineupPanel";
 import { LineupTable } from "../components/LineupTable";
@@ -24,7 +25,12 @@ export function Moves() {
   const pool = useQuery({ queryKey: ["move-pool", team, mode], queryFn: () => get<MovePool>(`/ui/teams/${team}/move-pool`, { mode }) });
   const inc = incoming[mode];
   const out = mode === "trade" ? outgoing : [];
-  const move = useMutation({ mutationFn: () => post<MoveResult>("/ui/move", { team, incoming: inc, outgoing: out }) });
+  const resultRef = useRef<HTMLDivElement>(null);
+  // The result renders below the controls; bring it into view so the click visibly lands.
+  const move = useMutation({
+    mutationFn: () => post<MoveResult>("/ui/move", { team, incoming: inc, outgoing: out }),
+    onSuccess: () => requestAnimationFrame(() => resultRef.current && scrollToElement(resultRef.current)),
+  });
   const [ranKey, setRanKey] = useState("");
   const key = `${team}|${mode}|${inc.join(",")}|${out.join(",")}`;
 
@@ -35,7 +41,7 @@ export function Moves() {
   return (
     <>
       <PageHeader title={`Signings and Trades, ${teamInfo?.name ?? team}`} />
-      <Section first title="Evaluate a move" description="Add or remove players and re-score every lineup with the same model the Draft Room uses. Fit is measured against this roster.">
+      <LeadSection title="Evaluate a move" description="Add or remove players and re-score every lineup with the same model the Draft Room uses. Fit is measured against this roster.">
       <div className={s.controls}>
         <Segmented<Mode>
           label="Move type"
@@ -67,7 +73,7 @@ export function Moves() {
               hint={mode === "signing" ? "Up to three free agents." : "Up to three players from other teams."}
             />
             {mode === "trade" && (
-              <PersonPicker label="Outgoing" options={outOpts} value={outgoing} onChange={setOutgoing} max={4} placeholder={`Players leaving the ${teamInfo?.name ?? team}`} hint="Up to four of your players." />
+              <PersonPicker label="Outgoing" options={outOpts} value={outgoing} onChange={setOutgoing} max={4} placeholder={`Players leaving the ${teamInfo?.name ?? team}…`} hint="Up to four of your players." />
             )}
           </div>
           <div className={s.controls}>
@@ -80,18 +86,19 @@ export function Moves() {
                 move.mutate();
               }}
             >
-              {move.isPending ? `Re-scoring every ${teamInfo?.name ?? team} lineup` : "Evaluate move"}
+              {move.isPending ? `Re-scoring every ${teamInfo?.name ?? team} lineup…` : "Evaluate move"}
             </Button>
           </div>
           {!inc.length && <Note>Choose at least one incoming player to evaluate the move.</Note>}
           {move.error && <ErrorState error={move.error} onRetry={() => move.mutate()} />}
         </div>
       )}
-      </Section>
+      </LeadSection>
 
       {r && (
+        <div ref={resultRef}>
         <Section title="Result">
-          {ranKey !== key && <Note tone="warn">The move changed since this evaluation. Click Evaluate move to update.</Note>}
+          {ranKey !== key && <Note tone="warn">The move changed since this evaluation. Select Evaluate move to update.</Note>}
           <StatLine
             stats={[
               { label: "Best lineup net", value: r.after_best, signed: true, delta: `${signed(r.ceiling_delta, 2)} vs now`, help: "Projected net rating of the best five-man unit after the move" },
@@ -122,6 +129,7 @@ export function Moves() {
           </div>
           <LineupPanel detail={r.best_after} title="New best lineup" />
         </Section>
+        </div>
       )}
     </>
   );

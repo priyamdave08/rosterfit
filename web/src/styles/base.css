@@ -58,6 +58,17 @@ textarea {
   color: inherit;
 }
 
+/* Every clickable control says so (zero specificity, so component cursors such as help win). */
+:where(button:not(:disabled), select:not(:disabled), summary, label:has(> input[type="radio"]), label:has(> input[type="checkbox"])) {
+  cursor: pointer;
+}
+
+/* No double-tap zoom delay on controls; a quiet ink tap flash instead of the default blue. */
+:where(a, button, select, summary, label, input) {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(18, 18, 18, 0.08);
+}
+
 :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;

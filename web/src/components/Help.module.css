@@ -7,6 +7,8 @@
   border: 0;
   background: none;
   padding: 5px;
+  /* 24px hit area that overhangs its neighbors' gap instead of widening table headers */
+  margin-inline: -4px;
   color: var(--muted);
   cursor: help;
   display: inline-grid;

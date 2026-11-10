@@ -37,7 +37,11 @@
   gap: var(--s-2);
   flex-wrap: wrap;
 }
-.counter { display: inline-flex; }
+.counter {
+  display: inline-flex;
+  /* the counter's hidden digit-measuring row is wider than a narrow cell; keep it from widening the page */
+  overflow-x: clip;
+}
 .word {
   font-size: var(--fs-lg);
   line-height: 1.3;
@@ -56,6 +60,7 @@
   justify-self: start;
   align-self: start;
   display: inline-block;
+  padding-block: 3px; /* 24px target */
   margin-top: 2px;
   font-size: var(--fs-sm);
   font-weight: 600;

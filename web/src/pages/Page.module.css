@@ -1,6 +1,7 @@
 .split {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  /* the table never scrolls sideways on desktop: it takes at least its min-content width and the court gives way */
+  grid-template-columns: minmax(min-content, 1.45fr) minmax(0, 1fr);
   gap: var(--s-5);
   align-items: start;
 }
@@ -87,7 +88,7 @@
   gap: var(--s-3);
 }
 .prose strong { color: var(--ink); }
-@media (max-width: 1080px) {
+@media (max-width: 1180px) {
   .split { grid-template-columns: 1fr; }
   .stickyCol { position: static; order: -1; }
 }
@@ -192,3 +193,5 @@
 @media (pointer: coarse) {
   .linkBtn { min-height: 44px; }
 }
+
+.undoRow { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }

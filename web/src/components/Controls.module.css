@@ -55,7 +55,8 @@
   border-radius: var(--radius);
   background: var(--surface);
 }
-.text:focus { outline: 0; border-color: var(--focus); box-shadow: 0 0 0 1px var(--focus); }
+.text:focus { border-color: var(--focus); }
+.text:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .text::placeholder { color: var(--muted); }
 
 .segmented { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: var(--s-1); }

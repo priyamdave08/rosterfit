@@ -16,7 +16,7 @@
 .pick:hover .names { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
 .nums {
   display: flex;
-  gap: 4px;
+  gap: 2px; /* the outer twill layer already pads each numeral */
 }
 .names {
   color: var(--ink-2);

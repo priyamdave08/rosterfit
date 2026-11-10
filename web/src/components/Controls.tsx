@@ -1,4 +1,4 @@
-import { useId, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { useId, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from "react";
 import s from "./Controls.module.css";
 
 export function Button({ variant = "secondary", busy, children, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary"; busy?: boolean }) {
@@ -49,14 +49,17 @@ export function Slider({ label, value, min, max, step, onChange, format, help }:
   );
 }
 
-export function TextField({ label, value, onChange, placeholder, maxLength, help }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; maxLength?: number; help?: string }) {
+type InputAttrs = Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "id" | "className">;
+
+/** Labelled text input. Extra input attributes (name, type, autoComplete, spellCheck) pass through. */
+export function TextField({ label, value, onChange, help, ...input }: { label: string; value: string; onChange: (v: string) => void; help?: string } & InputAttrs) {
   const id = useId();
   return (
     <div className={s.field}>
       <label htmlFor={id} className={s.fieldLabel}>
         {label}
       </label>
-      <input id={id} className={s.text} value={value} placeholder={placeholder} maxLength={maxLength} onChange={(e) => onChange(e.target.value)} aria-describedby={help ? `${id}-help` : undefined} />
+      <input autoComplete="off" {...input} id={id} className={s.text} value={value} onChange={(e) => onChange(e.target.value)} aria-describedby={help ? `${id}-help` : undefined} />
       {help && (
         <p id={`${id}-help`} className={s.help}>
           {help}
@@ -85,9 +88,17 @@ export function Checks<T extends string>({ label, options, value, onChange }: { 
   );
 }
 
-export function Section({ title, description, actions, children, first }: { title: string; description?: ReactNode; actions?: ReactNode; children: ReactNode; first?: boolean }) {
+interface SectionProps {
+  title: string;
+  description?: ReactNode;
+  actions?: ReactNode;
+  children: ReactNode;
+  id?: string;
+}
+
+function SectionFrame({ title, description, actions, children, id, className }: SectionProps & { className: string }) {
   return (
-    <section className={`${s.section} ${first ? s.first : ""}`}>
+    <section className={className} id={id}>
       <div className={s.sectionHead}>
         <div>
           <h2>{title}</h2>
@@ -98,6 +109,16 @@ export function Section({ title, description, actions, children, first }: { titl
       {children}
     </section>
   );
+}
+
+/** A titled section below the first one: separated from the content above by a hairline. */
+export function Section(props: SectionProps) {
+  return <SectionFrame {...props} className={s.section} />;
+}
+
+/** The page's first section: owns the first viewport, so it has no rule above it. */
+export function LeadSection(props: SectionProps) {
+  return <SectionFrame {...props} className={`${s.section} ${s.first}`} />;
 }
 
 /** The page's H1 for assistive tech; the active tab already shows the name, so it isn't repeated visually. */

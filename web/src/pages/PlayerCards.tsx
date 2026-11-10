@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { get } from "../lib/api";
 import { fixed, pct } from "../lib/format";
 import { useTeam } from "../lib/team";
+import { useUrlParam } from "../lib/url";
 import type { Person, PlayerCard } from "../lib/types";
 import { Radar, ZoneChart } from "../components/Charts";
 import { PageHeader, Section, TextField } from "../components/Controls";
@@ -21,14 +22,20 @@ const SOURCE_HELP: Record<string, string> = {
 
 export function PlayerCards() {
   const { meta } = useTeam();
-  const [q, setQ] = useState("");
+  // Search text and the open card live in the URL (?q=wemb&player=ID) so a card can be linked.
+  const [qParam, setQParam] = useUrlParam("q");
+  const [q, setQLocal] = useState(qParam ?? "");
+  const setQ = (v: string) => {
+    setQLocal(v);
+    setQParam(v.trim() || null);
+  };
   const [dq, setDq] = useState("");
   useEffect(() => {
     const t = setTimeout(() => setDq(q), 250);
     return () => clearTimeout(t);
   }, [q]);
   const search = useQuery({ queryKey: ["players", dq], queryFn: () => get<{ count: number; players: Person[] }>("/ui/players", { q: dq, limit: 60 }), placeholderData: (prev) => prev });
-  const [pid, setPid] = useState<string | null>(null);
+  const [pid, setPid] = useUrlParam("player");
   const list = search.data?.players ?? [];
   const current = pid && list.some((p) => p.id === pid) ? pid : list[0]?.id ?? null;
 
@@ -37,13 +44,13 @@ export function PlayerCards() {
       <PageHeader title="Player Cards" />
       <div className={s.cardsLayout}>
         <aside className={s.searchCol}>
-          <TextField label="Search players" value={q} onChange={setQ} placeholder="Name or team code, e.g. wemb, Doncic, SAS" help="Matches any part of a name, ignores accents and tolerates typos. A team code lists that roster." />
+          <TextField label="Search players" value={q} onChange={setQ} placeholder="Name or team code, e.g. wemb, Doncic, SAS…" type="search" name="player-search" spellCheck={false} help="Matches any part of a name, ignores accents and tolerates typos. A team code lists that roster." />
           {search.error ? (
             <ErrorState error={search.error} onRetry={() => search.refetch()} />
           ) : !search.data ? (
-            <Skeleton height={300} label="Searching" />
+            <Skeleton height={300} label="Searching players" />
           ) : list.length === 0 ? (
-            <Empty>No players match "{dq}". Try part of a first or last name, or a team code such as BOS.</Empty>
+            <Empty>No players match “{dq}”. Try part of a first or last name, or a team code such as BOS.</Empty>
           ) : (
             <>
               <p className={s.hint} aria-live="polite">

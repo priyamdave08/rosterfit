@@ -1,8 +1,9 @@
-import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
+import { createContext, use, useEffect, useMemo, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { get } from "./api";
 import { applyColorway, colorway } from "./color";
+import { KEY, readStored } from "./teamStorage";
 import type { Meta, Team } from "./types";
 
 interface TeamState {
@@ -15,16 +16,6 @@ interface TeamState {
 }
 
 const TeamContext = createContext<TeamState | null>(null);
-const KEY = "rosterfit.team";
-
-function readStored(): string | null {
-  try {
-    return window.localStorage.getItem(KEY);
-  } catch {
-    return null;
-  }
-}
-
 /** The selected team lives in the URL (?team=SAS) so links and reloads keep it. */
 export function TeamProvider({ children }: { children: ReactNode }) {
   const [params, setParams] = useSearchParams();
@@ -54,6 +45,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
         }
         const next = new URLSearchParams(params);
         next.set("team", abbr);
+        next.delete("unit"); // unit ranks belong to the previous team's list
         setParams(next, { replace: true });
       },
     }),
@@ -63,7 +55,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
 }
 
 export function useTeam(): TeamState {
-  const ctx = useContext(TeamContext);
+  const ctx = use(TeamContext);
   if (!ctx) throw new Error("useTeam must be used inside TeamProvider");
   return ctx;
 }

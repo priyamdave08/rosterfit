@@ -5,7 +5,7 @@ import s from "./States.module.css";
 export function Skeleton({ height = 160, label }: { height?: number; label: string }) {
   return (
     <div className={s.skeleton} style={{ height }} role="status" aria-live="polite">
-      <span className={s.skeletonLabel}>{label}</span>
+      <span className={s.skeletonLabel}>{label.endsWith("…") ? label : `${label}…`}</span>
     </div>
   );
 }

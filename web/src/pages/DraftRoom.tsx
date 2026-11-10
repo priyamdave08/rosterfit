@@ -3,10 +3,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { get, post } from "../lib/api";
 import { ORDINAL } from "../lib/color";
 import { fixed, height, pct, signed } from "../lib/format";
+import { scrollToElement } from "../lib/motion";
 import { useTeam } from "../lib/team";
+import { useUrlParam } from "../lib/url";
 import type { Board, DraftFit, Memo, ProspectReport } from "../lib/types";
 import { DriverBars, ShareBars, ZoneChart } from "../components/Charts";
-import { Button, Checks, PageHeader, Section, Slider, TextField } from "../components/Controls";
+import { Button, Checks, LeadSection, PageHeader, Section, Slider, TextField } from "../components/Controls";
 import { DataTable } from "../components/DataTable";
 import { LineupPanel } from "../components/LineupPanel";
 import { MemoText } from "../components/MemoText";
@@ -51,18 +53,29 @@ export function DraftRoom() {
     placeholderData: (prev) => prev,
   });
   const rows = board.data?.prospects ?? [];
-  const [sel, setSel] = useState<number | null>(null);
-  const selected = sel != null && rows.some((r) => r.torvik_id === sel) ? sel : rows[0]?.torvik_id ?? null;
+  // The selected prospect lives in the URL (?prospect=ID): links open his report, and it starts
+  // loading in parallel with the board instead of after it.
+  const [selParam, setSelParam] = useUrlParam("prospect");
+  const sel = selParam != null && Number.isFinite(Number(selParam)) ? Number(selParam) : null;
+  const selected = sel != null && (!board.data || rows.some((r) => r.torvik_id === sel)) ? sel : rows[0]?.torvik_id ?? null;
+  const choose = (id: number) => {
+    setSelParam(String(id));
+    // the report renders below the board: bring it into view so the selection visibly lands
+    requestAnimationFrame(() => {
+      const el = document.getElementById("report");
+      if (el) scrollToElement(el);
+    });
+  };
 
   return (
     <>
       <PageHeader title={`Draft Room, ${teamInfo?.name ?? team}`} />
-      <Section first title="Big board" description="Grade = percentile of expected 4-year VORP among college draftees since 2010, from college stats only (draft slot is not an input). Select a name for his report.">
+      <LeadSection title="Big board" description="Grade = percentile of expected 4-year VORP among college draftees since 2010, from college stats only (draft slot is not an input). Select a name for his report.">
         <div className={s.filters} role="group" aria-label="Board filters">
         <Slider label="Min. college minutes" value={minMin} min={0} max={1500} step={50} onChange={setMinMin} />
         <Slider label="Min. draftability" value={minDraft} min={0} max={1} step={0.05} onChange={setMinDraft} format={(v) => v.toFixed(2)} help="Probability of being drafted, from a model of every final college season since 2010." />
         <Checks<Cls> label="Class" options={[...CLASSES]} value={classes} onChange={setClasses} />
-        <TextField label="Search name" value={q} onChange={setQ} placeholder="e.g. Bidunga" />
+        <TextField label="Search name" value={q} onChange={setQ} placeholder="e.g. Bidunga…" type="search" name="prospect-search" spellCheck={false} />
       </div>
 
         {board.error ? (
@@ -71,7 +84,7 @@ export function DraftRoom() {
           <Skeleton height={380} label="Grading prospects" />
         ) : rows.length === 0 ? (
           <Empty>
-            {dq.trim() ? `No prospect matches "${dq}" with these filters.` : "No prospects pass these filters."} Lower the minimum minutes or draftability, or add class years.
+            {dq.trim() ? `No prospect matches “${dq}” with these filters.` : "No prospects pass these filters."} Lower the minimum minutes or draftability, or add class years.
           </Empty>
         ) : (
           <>
@@ -88,7 +101,7 @@ export function DraftRoom() {
                   align: "left",
                   sortValue: (r) => r.player,
                   render: (r) => (
-                    <button type="button" className={s.linkBtn} onClick={() => setSel(r.torvik_id)} aria-pressed={selected === r.torvik_id}>
+                    <button type="button" className={s.linkBtn} onClick={() => choose(r.torvik_id)} aria-pressed={selected === r.torvik_id}>
                       {r.player}
                     </button>
                   ),
@@ -112,7 +125,7 @@ export function DraftRoom() {
             </p>
           </>
         )}
-      </Section>
+      </LeadSection>
 
       {selected != null && <ProspectReportView key={selected} id={selected} />}
       {rows.length > 0 && <TeamFit key={team} board={rows} />}
@@ -125,13 +138,12 @@ function ProspectReportView({ id }: { id: number }) {
   const report = useQuery({ queryKey: ["prospect", id], queryFn: () => get<ProspectReport>(`/ui/prospects/${id}`) });
   const memo = useMutation({ mutationFn: () => post<Memo>(`/ui/prospects/${id}/memo`, { team }) });
   const writer = meta?.memo_writer === "bedrock" ? "Claude on Amazon Bedrock" : meta?.memo_writer === "anthropic" ? "the Claude API" : "the built-in template (no Claude API key configured)";
-  useEffect(() => memo.reset(), [team]); // eslint-disable-line react-hooks/exhaustive-deps
-  if (report.error) return <Section title="Prospect report"><ErrorState error={report.error} onRetry={() => report.refetch()} /></Section>;
-  if (!report.data) return <Section title="Prospect report"><Skeleton height={520} label="Computing his report" /></Section>;
+  if (report.error) return <Section id="report" title="Prospect report"><ErrorState error={report.error} onRetry={() => report.refetch()} /></Section>;
+  if (!report.data) return <Section id="report" title="Prospect report"><Skeleton height={520} label="Computing his report" /></Section>;
   const r = report.data;
   const p = r.profile;
   return (
-    <Section title={`${p.player}, ${p.team}`} description="Probabilities, the college stats behind the grade, his college shot profile and the most similar past draftees.">
+    <Section id="report" title={`${p.player}, ${p.team}`} description="Probabilities, the college stats behind the grade, his college shot profile and the most similar past draftees.">
       <StatLine
         stats={[
           { label: "Grade", value: `${p.grade} (${p.grade_score.toFixed(0)})`, help: "Letter grade and percentile" },
@@ -175,7 +187,7 @@ function ProspectReportView({ id }: { id: number }) {
       <div className={s.subsection}>
         <div className={s.controls}>
           <Button onClick={() => memo.mutate()} busy={memo.isPending} title={`Written by ${writer}`}>
-            {memo.isPending ? "Evaluating team fit and writing the memo" : `Write scouting memo for the ${teamInfo?.name ?? team}`}
+            {memo.isPending ? "Evaluating team fit and writing the memo…" : `Write scouting memo for the ${teamInfo?.name ?? team}`}
           </Button>
           <span className={s.hint}>Written by {writer}.</span>
         </div>
@@ -209,7 +221,7 @@ function TeamFit({ board }: { board: Board["prospects"] }) {
       title={`Fit with the ${teamInfo?.name ?? team}`}
       description="Each prospect is dropped into the roster as a rookie and every lineup is re-scored. The board score blends his standalone grade with that fit."
     >
-      <PersonPicker label="Prospects to compare" options={options} value={ids} onChange={setChosen} max={12} placeholder="Add a prospect" hint="Up to 12 prospects from the board above." />
+      <PersonPicker label="Prospects to compare" options={options} value={ids} onChange={setChosen} max={12} placeholder="Add a prospect…" hint="Up to 12 prospects from the board above." />
       <div className={s.saveRow} style={{ maxWidth: 640 }}>
         <Slider label="Weight on standalone talent vs. team fit" value={weight} min={0} max={1} step={0.05} onChange={setWeight} format={(v) => v.toFixed(2)} help="1.00 ranks by grade only; 0.00 ranks by fit with this roster only." />
         <Button
@@ -221,7 +233,7 @@ function TeamFit({ board }: { board: Board["prospects"] }) {
             fit.mutate();
           }}
         >
-          {fit.isPending ? `Re-scoring with ${ids.length} prospects` : "Run fit analysis"}
+          {fit.isPending ? `Re-scoring with ${ids.length} prospects…` : "Run fit analysis"}
         </Button>
       </div>
       {!ids.length && <Note>Choose at least one prospect to compare.</Note>}

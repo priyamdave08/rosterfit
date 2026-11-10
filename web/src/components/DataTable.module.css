@@ -18,12 +18,12 @@ th {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--ink-2);
-  padding: var(--s-2) 10px;
+  padding: var(--s-2) var(--s-2);
   border-bottom: 1px solid var(--rule);
   white-space: nowrap;
 }
 td {
-  padding: var(--s-2) 10px;
+  padding: var(--s-2) var(--s-2);
   border-bottom: 1px solid var(--rule-soft);
   vertical-align: middle;
 }
@@ -45,6 +45,7 @@ tbody tr:hover td { background: color-mix(in srgb, var(--surface-sunk) 55%, var(
   align-items: center;
   gap: 4px;
   min-height: 24px;
+  min-width: 24px;
   padding-block: 4px;
   border-radius: 2px;
 }

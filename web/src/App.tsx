@@ -2,13 +2,14 @@ import { lazy, Suspense } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import { Shell } from "./components/Shell";
 import { ErrorState, Skeleton } from "./components/States";
+import { loadDraftRoom, loadModelCard, loadMoves, loadPlayerCards } from "./lib/routes";
 import { useTeam } from "./lib/team";
 import { LineupLab } from "./pages/LineupLab";
 
-const DraftRoom = lazy(() => import("./pages/DraftRoom").then((m) => ({ default: m.DraftRoom })));
-const Moves = lazy(() => import("./pages/Moves").then((m) => ({ default: m.Moves })));
-const PlayerCards = lazy(() => import("./pages/PlayerCards").then((m) => ({ default: m.PlayerCards })));
-const ModelCardPage = lazy(() => import("./pages/ModelCard").then((m) => ({ default: m.ModelCardPage })));
+const DraftRoom = lazy(() => loadDraftRoom().then((m) => ({ default: m.DraftRoom })));
+const Moves = lazy(() => loadMoves().then((m) => ({ default: m.Moves })));
+const PlayerCards = lazy(() => loadPlayerCards().then((m) => ({ default: m.PlayerCards })));
+const ModelCardPage = lazy(() => loadModelCard().then((m) => ({ default: m.ModelCardPage })));
 
 export function App() {
   const { error, isLoading, team } = useTeam();
@@ -19,7 +20,7 @@ export function App() {
       ) : isLoading ? (
         <Skeleton height={480} label="Loading teams and rosters" />
       ) : (
-        <Suspense fallback={<Skeleton height={480} label="Opening workspace" />}>
+        <Suspense fallback={<Skeleton height={480} label="Opening the workspace" />}>
           <Routes>
             <Route path="/" element={<LineupLab key={team} />} />
             <Route path="/draft" element={<DraftRoom key={team} />} />

@@ -198,7 +198,7 @@ Set on `:root` from the selected team by `lib/color.ts` and never hard-coded: `-
 
 A single centered column up to 1320px with 32px side gutters (16px under 900px), on a 4px spacing scale. The shell bar is 64px and sticky on wide screens; at 900px and below its tabs wrap onto their own rows and the bar scrolls away with the page, so `--bar-stick` drops to 0 and scroll padding, sticky columns and in-page anchors stop reserving space for it. Sections are separated by 48px and a hairline; the first section of each page has no rule and owns the first viewport.
 
-Lineup Lab pairs a ranked table (about 1.45fr) with a sticky right column (stat line plus half court). Under 1080px the court and stats move above the table, and selecting a unit scrolls the court into view. Tables scroll horizontally inside their own frame on narrow screens; the page itself never scrolls sideways. On touch screens every control outside running text is at least 44px tall, and help buttons get a 44px hit area that overhangs instead of adding line height.
+Lineup Lab pairs a ranked table (about 1.45fr) with a sticky right column (stat line plus half court). Under 1180px the court and stats move above the table, and selecting a unit scrolls the court into view. Tables scroll horizontally inside their own frame on narrow screens; the page itself never scrolls sideways. On touch screens every control outside running text is at least 44px tall, and help buttons get a 44px hit area that overhangs instead of adding line height.
 
 ## Elevation & Depth
 
@@ -234,7 +234,7 @@ A row of radio segments in one hairline frame; the chosen segment is ink with gr
 
 ### Data table
 - **Header:** sunk panel, Archivo Narrow uppercase labels, sticky. Sortable headers are real buttons (24px minimum, 44px on touch) with a two-triangle glyph; a help button sits 6px to the right of the label.
-- **Rows:** hairline separators, 8px by 10px cells, sunk hover tint on fine pointers.
+- **Rows:** hairline separators, 8px cells, sunk hover tint on fine pointers. On desktop the ranked units table never scrolls sideways: its column takes at least its min-content width and the court gives way.
 - **Selected row:** a 9% team tint plus a 2px ink rule above and below, and a bold rank, so the state never rests on tint alone.
 
 ### Help tooltip
@@ -260,6 +260,11 @@ The selected unit's five numerals stand at their spots on a regulation half cour
 - **Do** put an explanation one click from every headline number: a help button or an evidence link.
 - **Do** keep motion to state feedback under 300ms on the strong ease-out or ease-in-out curves, transforms and opacity only, and drop it under reduced motion.
 - **Do** gate hover styles to `(hover: hover) and (pointer: fine)` and keep touch targets at 44px.
+- **Do** keep every pointer target at least 24px (WCAG 2.5.8), letting small hit areas overhang instead of widening the layout.
+- **Do** keep page state in the URL (`?team`, `?unit`, `?prospect`, `?player`, `?q`) so a reload or a shared link opens the same view; workspace tabs carry only the team.
+- **Do** make removals reversible with an Undo next to the result rather than a confirmation dialog.
+- **Do** bring a result that renders out of view (a prospect report, a move evaluation) into view when it is requested.
+- **Do** end loading and in-progress labels with an ellipsis and use curly quotes in interface copy.
 
 ### Don't:
 - **Don't** use team color to encode a value, a direction or a status.

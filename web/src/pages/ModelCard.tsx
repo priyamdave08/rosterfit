@@ -4,7 +4,7 @@ import { ORDINAL } from "../lib/color";
 import { useTeam } from "../lib/team";
 import type { ModelCard } from "../lib/types";
 import { Legend, LineChart } from "../components/Charts";
-import { PageHeader, Section } from "../components/Controls";
+import { LeadSection, PageHeader, Section } from "../components/Controls";
 import { DataTable } from "../components/DataTable";
 import { StatLine } from "../components/StatLine";
 import { ErrorState, Skeleton } from "../components/States";
@@ -37,7 +37,7 @@ export function ModelCardPage() {
   return (
     <>
       <PageHeader title="Model Card" />
-      <Section first title="Lineup efficiency model" description="How the two models are trained, and how well they predict on seasons and draft classes they never saw.">
+      <LeadSection title="Lineup efficiency model" description="How the two models are trained, and how well they predict on seasons and draft classes they never saw.">
         <div className={s.prose}>
           <p>
             Predicts a lineup's offensive and defensive rating (per 100 possessions, vs league average) from the five players' <strong>prior-season</strong> profiles. Trained on every
@@ -52,7 +52,7 @@ export function ModelCardPage() {
             { label: "Defense R²", value: lm.def_rtg_rel_r2_blend, decimals: 2, delta: `${(lm.def_rtg_rel_r2_blend - lm.def_rtg_rel_r2_bpm_baseline >= 0 ? "+" : "")}${(lm.def_rtg_rel_r2_blend - lm.def_rtg_rel_r2_bpm_baseline).toFixed(2)} vs BPM-only` },
           ]}
         />
-      </Section>
+      </LeadSection>
       <Section title="Prospect outcome model">
         <div className={s.prose}>
           <p>
@@ -109,7 +109,7 @@ export function ModelCardPage() {
       </Section>
       <details className={s.details}>
         <summary>All metrics (raw)</summary>
-        <pre className={`${s.raw} scroll-area`} data-lenis-prevent>
+        <pre className={`${s.raw} scroll-area`} data-lenis-prevent tabIndex={0} aria-label="All metrics as raw JSON">
           {JSON.stringify({ lineup: lm, prospect: pm }, null, 2)}
         </pre>
       </details>

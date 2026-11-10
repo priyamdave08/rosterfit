@@ -27,7 +27,7 @@ const norm = (t: string) =>
     .replace(/[^a-z0-9 ]/g, "");
 
 /** Accessible multi-select combobox: type to filter, arrows to move, Enter to add, Backspace to remove. */
-export function PersonPicker({ label, options, value, onChange, max, placeholder = "Type a name to search", hint }: Props) {
+export function PersonPicker({ label, options, value, onChange, max, placeholder = "Type a name to search…", hint }: Props) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -93,6 +93,9 @@ export function PersonPicker({ label, options, value, onChange, max, placeholder
           aria-autocomplete="list"
           aria-activedescendant={open && matches[active] ? `${id}-opt-${active}` : undefined}
           aria-describedby={hint ? `${id}-hint` : undefined}
+          autoComplete="off"
+          spellCheck={false}
+          name={`${id}-search`}
           placeholder={full ? "Limit reached: remove one to add another" : placeholder}
           disabled={full}
           value={q}
@@ -131,7 +134,7 @@ export function PersonPicker({ label, options, value, onChange, max, placeholder
       {open && !full && (
         <ul id={`${id}-list`} role="listbox" className={`${s.list} scroll-area`} data-lenis-prevent aria-label={label}>
           {matches.length === 0 ? (
-            <li className={s.none}>No matches for "{q}".</li>
+            <li className={s.none}>No matches for “{q}”.</li>
           ) : (
             matches.map((o, i) => (
               <li

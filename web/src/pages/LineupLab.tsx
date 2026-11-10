@@ -3,9 +3,11 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { get, post } from "../lib/api";
 import { fixed, pct, signed } from "../lib/format";
 import { scrollToElement } from "../lib/motion";
+import { lineupsQuery } from "../lib/queries";
 import { useTeam } from "../lib/team";
-import type { CustomLineup, LineupDetail, LineupList, Person, RosterPlayer } from "../lib/types";
-import { Button, PageHeader, Section, Segmented, TextField } from "../components/Controls";
+import type { CustomLineup, LineupDetail, Person, RosterPlayer } from "../lib/types";
+import { useUrlParam } from "../lib/url";
+import { Button, LeadSection, PageHeader, Section, Segmented, TextField } from "../components/Controls";
 import { DriverBars, ShareBars } from "../components/Charts";
 import { DataTable } from "../components/DataTable";
 import { LineupPanel } from "../components/LineupPanel";
@@ -24,17 +26,30 @@ interface Saved {
   ids: string[];
 }
 const SAVED_KEY = "rosterfit.savedLineups";
+const SAVED_VERSION = 1;
 
+const isSaved = (x: unknown): x is Saved =>
+  !!x &&
+  typeof (x as Saved).name === "string" &&
+  typeof (x as Saved).team === "string" &&
+  Array.isArray((x as Saved).ids) &&
+  (x as Saved).ids.length === 5 &&
+  (x as Saved).ids.every((id) => typeof id === "string");
+
+/** Versioned, validated storage (React best practices: client-localstorage-schema). Reads the
+ *  original unversioned array too, so lineups saved before this change are kept. */
 function loadSaved(): Saved[] {
   try {
-    return JSON.parse(window.localStorage.getItem(SAVED_KEY) ?? "[]") as Saved[];
+    const raw: unknown = JSON.parse(window.localStorage.getItem(SAVED_KEY) ?? "null");
+    const items = Array.isArray(raw) ? raw : raw && typeof raw === "object" && "items" in raw ? (raw as { items: unknown }).items : [];
+    return Array.isArray(items) ? items.filter(isSaved) : [];
   } catch {
     return [];
   }
 }
-function storeSaved(v: Saved[]) {
+function storeSaved(items: Saved[]) {
   try {
-    window.localStorage.setItem(SAVED_KEY, JSON.stringify(v));
+    window.localStorage.setItem(SAVED_KEY, JSON.stringify({ v: SAVED_VERSION, items }));
   } catch {
     /* storage blocked: the list still works for this visit */
   }
@@ -42,12 +57,14 @@ function storeSaved(v: Saved[]) {
 
 export function LineupLab() {
   const { team, teamInfo, meta } = useTeam();
-  const lineups = useQuery({ queryKey: ["lineups", team], queryFn: () => get<LineupList>(`/ui/teams/${team}/lineups`, { top: 15 }) });
-  const [inspect, setInspect] = useState(1); // page remounts per team (App keys it), so this starts at #1
+  const lineups = useQuery(lineupsQuery(team));
+  // The inspected unit lives in the URL (?unit=3), so a reload or a shared link opens the same unit.
+  const [unitParam, setUnitParam] = useUrlParam("unit");
+  const inspect = Number(unitParam) || 1;
   const courtRef = useRef<HTMLDivElement>(null);
   const select = (rank: number) => {
-    setInspect(rank);
-    if (courtRef.current && window.matchMedia("(max-width: 1080px)").matches) scrollToElement(courtRef.current);
+    setUnitParam(rank === 1 ? null : String(rank));
+    if (courtRef.current && window.matchMedia("(max-width: 1180px)").matches) scrollToElement(courtRef.current);
   };
   const row = lineups.data?.lineups.find((l) => l.rank === inspect) ?? lineups.data?.lineups[0];
   const detail = useQuery({
@@ -60,8 +77,7 @@ export function LineupLab() {
   return (
     <>
       <PageHeader title={`Lineup Lab, ${teamInfo?.name ?? team}`} />
-      <Section
-        first
+      <LeadSection
         title="Best five-man units"
         description={`${lineups.data ? lineups.data.count.toLocaleString() : "Every"} realistic units from the ${teamInfo?.name ?? team} top 11, ranked by projected net per 100 possessions. Off and Def are vs league average.`}
       >
@@ -89,7 +105,7 @@ export function LineupLab() {
             </div>
           </div>
         )}
-      </Section>
+      </LeadSection>
       {detail.data && (
         <div className={s.pair} id="drivers">
           <DriverBars title={`What drives unit #${row?.rank}'s rating`} axisLabel="Effect on net rating" rows={detail.data.drivers.map((d) => ({ label: d.label, value: d.net_impact ?? 0 }))} />
@@ -134,6 +150,12 @@ function Builder({ bestIds }: { bestIds?: string[] }) {
   const [saved, setSaved] = useState<Saved[]>(loadSaved);
   const [name, setName] = useState("");
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
+  // Removing a saved lineup is immediate but reversible: the last removal can be undone.
+  const [removed, setRemoved] = useState<{ item: Saved; at: number } | null>(null);
+  const commit = (next: Saved[]) => {
+    setSaved(next);
+    storeSaved(next);
+  };
   const opts = useMemo(() => (options.data ?? []).map((p) => ({ id: p.id, label: p.label, person: p })), [options.data]);
 
   const save = () => {
@@ -142,11 +164,10 @@ function Builder({ bestIds }: { bestIds?: string[] }) {
       setSavedMsg("This exact lineup is already saved.");
       return;
     }
-    const next = [...saved, { name: label, team, ids: [...ids] }];
-    setSaved(next);
-    storeSaved(next);
+    commit([...saved, { name: label, team, ids: [...ids] }]);
     setName("");
-    setSavedMsg(`Saved "${label}".`);
+    setRemoved(null);
+    setSavedMsg(`Saved “${label}”.`);
   };
 
   const r = result.data;
@@ -197,18 +218,37 @@ function Builder({ bestIds }: { bestIds?: string[] }) {
           <CompareTable mine={r.metrics} best={r.best} />
           <LineupPanel detail={r} title="Your lineup" />
           <div className={s.saveRow}>
-            <TextField label="Lineup name" value={name} onChange={setName} placeholder={`Lineup ${saved.length + 1}`} maxLength={40} />
+            <TextField label="Lineup name" value={name} onChange={setName} placeholder={`Lineup ${saved.length + 1}`} maxLength={40} name="lineup-name" />
             <Button onClick={save}>Save lineup</Button>
           </div>
           {savedMsg && <p className={s.hint} aria-live="polite">{savedMsg}</p>}
         </>
       )}
-      <SavedLineups saved={saved} onRemove={(i) => {
-        const next = saved.filter((_, j) => j !== i);
-        setSaved(next);
-        storeSaved(next);
-        setSavedMsg(null);
-      }} />
+      {removed && (
+        <p className={`${s.hint} ${s.undoRow}`} role="status">
+          Removed “{removed.item.name}”.{" "}
+          <button
+            type="button"
+            className={s.linkBtn}
+            onClick={() => {
+              const next = [...saved];
+              next.splice(Math.min(removed.at, next.length), 0, removed.item);
+              commit(next);
+              setRemoved(null);
+            }}
+          >
+            Undo
+          </button>
+        </p>
+      )}
+      <SavedLineups
+        saved={saved}
+        onRemove={(i) => {
+          setRemoved({ item: saved[i], at: i });
+          commit(saved.filter((_, j) => j !== i));
+          setSavedMsg(null);
+        }}
+      />
     </Section>
   );
 }
@@ -271,7 +311,7 @@ function SavedLineups({ saved, onRemove }: { saved: Saved[]; onRemove: (i: numbe
                   <span>{x.r.players.map((p) => p.short).join(", ")}</span>
                 </span>
               ) : (
-                "Loading"
+                "Loading…"
               ),
           },
           { key: "net", header: "Net", render: (x) => (x.r ? signed(x.r.metrics.net) : "") },
@@ -281,7 +321,7 @@ function SavedLineups({ saved, onRemove }: { saved: Saved[]; onRemove: (i: numbe
             key: "remove",
             header: "",
             render: (x) => (
-              <Button onClick={() => onRemove(x.i)} aria-label={`Remove ${x.sv.name}`}>
+              <Button onClick={() => onRemove(x.i)} aria-label={`Remove lineup ${x.sv.name}`}>
                 Remove lineup
               </Button>
             ),

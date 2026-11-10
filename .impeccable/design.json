@@ -370,7 +370,7 @@
       },
       {
         "name": "court-above-table",
-        "value": "1080px"
+        "value": "1180px"
       },
       {
         "name": "compact-bar",
@@ -490,7 +490,12 @@
       "Do keep data colors fixed (hot, cold, slate) and independent of the team.",
       "Do put an explanation one click from every headline number: a help button or an evidence link.",
       "Do keep motion to state feedback under 300ms on the strong ease-out or ease-in-out curves, transforms and opacity only, and drop it under reduced motion.",
-      "Do gate hover styles to `(hover: hover) and (pointer: fine)` and keep touch targets at 44px."
+      "Do gate hover styles to `(hover: hover) and (pointer: fine)` and keep touch targets at 44px.",
+      "Do keep every pointer target at least 24px (WCAG 2.5.8), letting small hit areas overhang instead of widening the layout.",
+      "Do keep page state in the URL (`?team`, `?unit`, `?prospect`, `?player`, `?q`) so a reload or a shared link opens the same view; workspace tabs carry only the team.",
+      "Do make removals reversible with an Undo next to the result rather than a confirmation dialog.",
+      "Do bring a result that renders out of view (a prospect report, a move evaluation) into view when it is requested.",
+      "Do end loading and in-progress labels with an ellipsis and use curly quotes in interface copy."
     ],
     "donts": [
       "Don't use team color to encode a value, a direction or a status.",
