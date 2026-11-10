@@ -8,6 +8,8 @@ An NBA front-office tool that answers three questions with one engine:
 
 It runs on live 2026-27 rosters and on data back to 2010.
 
+**Live demo: [rosterfit.streamlit.app](https://rosterfit.streamlit.app)** (free hosting: the first visit after a quiet period takes about a minute to wake up, and the Draft Room fit analysis takes a minute or two).
+
 ## Results (out of sample)
 
 **Lineup efficiency model.** Predicts a lineup's offensive and defensive rating per 100 possessions from the five players' *previous-season* profiles. Trained on 450 team-seasons, validated leave-one-season-out.
