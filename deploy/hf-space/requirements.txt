@@ -1,0 +1,19 @@
+# The engine's own pins (the versions its demo models were trained with), minus the Streamlit
+# dashboard, plus the API server. The Space installs these next to Gradio.
+numpy==2.5.4
+pandas==3.1.1
+scipy==1.18.1
+scikit-learn==1.9.1
+joblib==1.6.0
+shap==0.54.1
+duckdb==2.0.0
+pyarrow==26.0.1
+rapidfuzz==3.14.6
+plotly==7.1.0
+requests==2.34.2
+beautifulsoup4==4.15.0
+lxml==6.1.3
+pydantic==2.14.3
+anthropic==2.7.0
+fastapi==0.162.2
+uvicorn[standard]==0.54.0
