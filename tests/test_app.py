@@ -43,3 +43,12 @@ def test_player_search_ranks_prefix_first(app):
     app.text_input[0].set_value("wemb").run()
     player = [s for s in app.selectbox if s.label.startswith("Player")][0]
     assert player.value == "wembavi01"
+
+
+def test_hosted_copy_points_to_the_react_app(monkeypatch):
+    """The public Streamlit address now sends visitors to the React app instead of the dashboard."""
+    monkeypatch.setenv("ROSTERFIT_SHOW_MOVED", "1")
+    at = AppTest.from_file(APP, default_timeout=60).run()
+    assert not at.exception
+    assert at.title[0].value == "RosterFit has moved"
+    assert "rosterfit.vercel.app" in at.markdown[0].value

@@ -11,6 +11,19 @@ export class ApiError extends Error {
   }
 }
 
+/** A sleeping or starting API answers with a network failure or a 502/503/504 until it is up. */
+export function isWakingError(error: unknown): boolean {
+  return error instanceof ApiError && (error.status === 0 || error.status === 502 || error.status === 503 || error.status === 504);
+}
+
+/** Retry policy shared by every query: keep trying for about three minutes while the API wakes. */
+export const WAKE_RETRIES = 36;
+export const WAKE_DELAY_MS = 5000;
+export const retryWhileWaking = (failureCount: number, error: unknown): boolean =>
+  isWakingError(error) ? failureCount < WAKE_RETRIES : failureCount < 1;
+export const wakeDelay = (attempt: number, error: unknown): number =>
+  isWakingError(error) ? WAKE_DELAY_MS : Math.min(1000 * 2 ** attempt, 8000);
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {

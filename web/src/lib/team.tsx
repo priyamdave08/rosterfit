@@ -12,6 +12,8 @@ interface TeamState {
   teamInfo: Team | undefined;
   setTeam: (abbr: string) => void;
   isLoading: boolean;
+  /** True while the first request keeps failing because the free API is still starting. */
+  waking: boolean;
   error: Error | null;
 }
 
@@ -36,6 +38,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
       team,
       teamInfo,
       isLoading: meta.isLoading,
+      waking: meta.isLoading && meta.failureCount > 0,
       error: meta.error,
       setTeam: (abbr: string) => {
         try {
@@ -49,7 +52,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
         setParams(next, { replace: true });
       },
     }),
-    [meta.data, meta.isLoading, meta.error, team, teamInfo, params, setParams],
+    [meta.data, meta.isLoading, meta.failureCount, meta.error, team, teamInfo, params, setParams],
   );
   return <TeamContext.Provider value={value}>{children}</TeamContext.Provider>;
 }

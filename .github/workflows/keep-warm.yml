@@ -1,0 +1,31 @@
+# Keeps the free Hugging Face Space behind rosterfit.vercel.app awake, so a first-time visitor
+# (for example someone opening a link from an email) doesn't wait for a cold start. The Space
+# sleeps after 48 hours without traffic; a request every six hours keeps it running.
+# GitHub pauses scheduled workflows after 60 days with no commits; re-enable it from the Actions tab.
+name: keep-warm
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Wake the engine API and confirm it answers
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null --max-time 60 https://priyamdave-rosterfit-api.hf.space/ui/meta; then
+              echo "API is up"
+              curl -sf -o /dev/null --max-time 60 https://rosterfit.vercel.app/ && echo "Front end is up"
+              exit 0
+            fi
+            echo "API still starting (attempt $i)"
+            sleep 15
+          done
+          echo "API did not answer within about 8 minutes"
+          exit 1

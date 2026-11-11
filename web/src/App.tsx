@@ -12,13 +12,16 @@ const PlayerCards = lazy(() => loadPlayerCards().then((m) => ({ default: m.Playe
 const ModelCardPage = lazy(() => loadModelCard().then((m) => ({ default: m.ModelCardPage })));
 
 export function App() {
-  const { error, isLoading, team } = useTeam();
+  const { error, isLoading, waking, team } = useTeam();
   return (
     <Shell>
       {error ? (
         <ErrorState error={error} onRetry={() => window.location.reload()} />
       ) : isLoading ? (
-        <Skeleton height={480} label="Loading teams and rosters" />
+        <Skeleton
+          height={480}
+          label={waking ? "Starting the RosterFit engine. After a quiet spell this takes about a minute" : "Loading teams and rosters"}
+        />
       ) : (
         <Suspense fallback={<Skeleton height={480} label="Opening the workspace" />}>
           <Routes>

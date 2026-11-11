@@ -8,11 +8,12 @@ An NBA front-office tool that answers three questions with one engine:
 
 It runs on live 2026-27 rosters and on data back to 2010.
 
-**Live app: [rosterfit.vercel.app](https://rosterfit.vercel.app)**, the React front end, backed by the engine API on a
+**Live app: [rosterfit.vercel.app](https://rosterfit.vercel.app)**, backed by the engine API on a
 [Hugging Face Space](https://huggingface.co/spaces/PriyamDave/rosterfit-api)
-([API docs](https://priyamdave-rosterfit-api.hf.space/docs)). The original Streamlit dashboard is still live at
-[rosterfit.streamlit.app](https://rosterfit.streamlit.app). All three run on free hosting, so the first visit after
-a quiet period can take a minute while the API wakes up, and the Draft Room fit analysis takes a minute or two.
+([API docs](https://priyamdave-rosterfit-api.hf.space/docs)). Both run on free hosting: a scheduled ping keeps the API
+awake, and if it has gone to sleep anyway the app says so and loads once it is up (about a minute). The Draft Room fit
+analysis takes a minute or two. The original Streamlit dashboard still runs locally (`make app`); its old public
+address now points to the live app.
 
 ## Results (out of sample)
 
